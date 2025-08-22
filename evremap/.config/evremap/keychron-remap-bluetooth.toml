@@ -1,0 +1,10 @@
+device_name = " Keychron K1 Version 6 Keyboard"
+
+[[dual_role]]
+input = "KEY_CAPSLOCK"
+hold = ["KEY_LEFTCTRL"]
+tap = ["KEY_ESC"]
+
+[[remap]]
+input = ["KEY_RIGHTSHIFT"]
+output = ["KEY_CAPSLOCK"]
