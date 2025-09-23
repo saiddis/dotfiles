@@ -1,7 +1,7 @@
 # Configuration file for HyDE
 # Environment variables should be on top
 # Updated config.toml file can be found at $HOME/.local/share/hyde/config.toml
-"$schema" = "https://raw.githubusercontent.com/HyDE-Project/HyDE/refs/heads/master/Configs/.local/share/hyde/schema/config.toml.json"
+# "$schema" = "/home/saiddis/.local/share/hyde/config.toml" #"https://raw.githubusercontent.com/HyDE-Project/HyDE/refs/heads/master/Configs/.local/share/hyde/schema/config.toml.json"
 
 # Global rofi configuration.
 [rofi]
@@ -96,7 +96,7 @@ icon_size = 14  # Icon size for waybar.
 position = "top"  # A fallback position of the waybar.  
 
 [hyprland]
-browser = "zen"  # Browser.
+browser = "zen-browser"  # Browser.
 editor = "nvim"  # Editor.
 explorer = "dolphin"  # File manager.
 idle = "hypridle"  # Idle manager.
@@ -106,7 +106,7 @@ quickapps = "ghostty"  # Quick apps.
 bar = "waybar"  # Bar.
 color_scheme = "prefer-dark"  # Color scheme.
 gtk_theme = "Mc-OS-Transparent-1.3"  # GTK theme.
-icon_theme = "Tela-circle-blue"  # Icon theme.
+icon_theme = "Papirus-Nordic"  # Icon theme.
 cursor_size = 24  # Cursor size.
 cursor_theme = "macOS"  # Cursor theme.
 button_layout = ""  # Button layout. (gtk only)
@@ -117,7 +117,7 @@ font_hinting = "meduim"  # Font hinting.
 font_size = 12  # Font size.
 monospace_font = "Hack Nerd Font"  # Monospace font.
 monospace_font_size = 12  # Monospace font size.
-background_path = ""  # LockScreen's Background path.
+background_path = "/home/saiddis/.config/hyde/themes/Solarized Dark/wallpapers/circle.png"  # LockScreen's Background path.
 
 [hyprland_start]
 apptray_bluetooth = "blueman-applet"  # Bluetooth applet.
