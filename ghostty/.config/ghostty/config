@@ -2,10 +2,11 @@ theme = Builtin Tango Dark
 
 font-family = CaskaydiaCove Nerd Font
 
+background-opacity = 1.0
 font-size = 13.0
 background = #000000
 gtk-titlebar = false
-cursor-color = #85dc85
+cursor-color = #25FF5F
 mouse-hide-while-typing = true
 gtk-tabs-location = hidden
 window-decoration = false
