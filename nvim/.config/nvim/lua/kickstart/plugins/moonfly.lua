@@ -5,9 +5,9 @@ return {
   priority = 1000,
 
   config = function()
-    vim.g.moonflyNormalFloat = true
+    vim.g.moonflyNormalFloat = false
     vim.diagnostic.config { float = { border = 'single' } }
-    vim.g.moonflyTransparent = true
+    vim.g.moonflyTransparent = false
     vim.g.moonflyUndercurls = true
     vim.g.moonflyWinSeparator = 0
     vim.g.moonflyUnderlineMatchParen = true
@@ -21,39 +21,70 @@ return {
       border = 'single',
     })
 
-    local custom_highlight = vim.api.nvim_create_augroup('CustomHighlight', {})
-    vim.api.nvim_create_autocmd('ColorScheme', {
-      pattern = 'moonfly',
-      callback = function()
-        -- vim.api.nvim_set_hl(0, 'Normal', { bg = '#000000' })
-      end,
-      group = custom_highlight,
-    })
+    local colors = require('moonfly').palette
 
-    local black = '#000000'
+    -- colors.purple = '#CD6BE6'
+    -- colors.violet = '#E173FC'
+    -- colors.cranberry = '#FF7E7E'
+    -- colors.red = '#F45B5D'
+    -- colors.lavender = '#C9C9F5'
+    --
+    -- colors.bg = '#000000'
+    -- colors.black = '#0D1B20'
+    -- colors.white = '#E4E5EC'
+    -- colors.grey15 = '#1E2A2E'
+    -- colors.green = '#6FDB59'
+    -- colors.lime = '#79EA97'
+    -- colors.emerald = '#69FF94'
+    -- colors.turquoise = '#43DBD2'
+    -- colors.khaki = '#FFD64C'
+    -- colors.yellow = '#FFFA9E'
+    -- colors.orange = '#FFB86C'
+    -- colors.sky = '#48C8ED'
+    -- colors.blue = '#4CB5FF'
+    -- colors.coral = '#DF8585'
+    --
 
-    -- vim.cmd()
+    colors.purple = '#AE81FF'
+    colors.violet = '#E593EE'
+    colors.cranberry = '#ff5874'
+    colors.red = '#fc514e'
+    colors.lavender = '#B9B9FA'
+    colors.orchid = '#F77AB8'
+
+    colors.bg = '#000000'
+    colors.black = '#0C1518'
+    colors.white = '#d6deeb'
+    colors.grey15 = '#1B2327'
+    colors.green = '#B1E268'
+    colors.lime = '#25FF5F'
+    colors.emerald = '#5ADA7C'
+    colors.turquoise = '#7fdbca'
+    colors.khaki = '#E6E666'
+    colors.yellow = '#FDFD70'
+    colors.orange = '#FC9949'
+    colors.sky = '#70BDF5'
+    colors.blue = '#339CFF'
+    colors.coral = '#FC9B7D'
+
+    require('moonfly').custom_colors(colors)
 
     vim.cmd [[colorscheme moonfly]]
-    local colors = require('moonfly').palette
-    local TelescopeColor = {
+
+    local OverrideColors = {
       TelescopeMatching = { fg = colors.coral },
-      TelescopeSelection = { fg = colors.purple, bg = colors.grey7, bold = true },
-      TelescopePromptPrefix = { bg = black },
-      TelescopePromptNormal = { bg = black },
-      TelescopeResultsNormal = { bg = black },
-      TelescopePreviewNormal = { bg = black },
-      TelescopePromptBorder = { bg = black, fg = colors.emerald },
-      TelescopeResultsBorder = { bg = black, fg = colors.emerald },
-      TelescopePreviewBorder = { bg = black, fg = colors.emerald },
-      TelescopePromptTitle = { bg = black, fg = colors.purple },
-      TelescopeResultsTitle = { fg = colors.purple },
-      TelescopePreviewTitle = { bg = black, fg = colors.purple },
-      FloatBorder = { bg = black, fg = colors.emerald },
-      CursorLineNr = { bg = colors.grey7, fg = colors.emerald, bold = true },
-      CursorLine = { bg = colors.grey7, bold = false },
-      LineNr = { fg = colors.mineral, bg = colors.black },
-      SignColumn = { fg = colors.mineral, bg = colors.black },
+      TelescopeSelection = { fg = colors.purple, bg = colors.grey15, bold = true },
+      TelescopePromptPrefix = { bg = colors.black },
+      TelescopePromptNormal = { bg = colors.grey15 },
+      TelescopeResultsNormal = { bg = colors.black },
+      TelescopePreviewNormal = { bg = colors.black },
+      TelescopePromptBorder = { bg = colors.grey15, fg = colors.grey15 },
+      TelescopeResultsBorder = { bg = colors.black, fg = colors.black },
+      TelescopePreviewBorder = { bg = colors.black, fg = colors.black },
+      TelescopePromptTitle = { bg = colors.mineral, fg = colors.emerald },
+      TelescopeResultsTitle = { bg = colors.mineral, fg = colors.emerald },
+      TelescopePreviewTitle = { bg = colors.mineral, fg = colors.emerald },
+
       GitSignsAdd = { fg = colors.lime, bg = colors.black, bold = true },
       GitSignsChange = { fg = colors.violet, bg = colors.black, bold = true },
       GitSignsDelete = { fg = colors.crimson, bg = colors.black, bold = true },
@@ -61,11 +92,20 @@ return {
       GitSignsChangeDelete = { fg = colors.orange, bg = colors.black, bold = true },
       GitSignsUntracked = { fg = colors.turquoise, bg = colors.black, bold = true },
       GitSignsCurrentLineBlame = { fg = colors.crimson, bg = colors.black, bold = true },
-      Directory = { fg = colors.green, bold = true },
-      NormalFloat = { bg = black },
+
+      FloatBorder = { bg = colors.black, fg = colors.black },
+      NormalFloat = { bg = colors.black },
+      CursorLineNr = { bg = colors.grey15, fg = colors.emerald, bold = true },
+      CursorLine = { bg = colors.grey15, bold = false },
+      CursorLineSign = { bg = colors.grey15 },
+      LineNr = { fg = colors.mineral, bg = colors.black },
+      SignColumn = { fg = colors.mineral, bg = colors.black },
+      Directory = { fg = colors.emerald, bold = true },
+
+      -- String = { fg = colors.yellow },
     }
 
-    for hl, col in pairs(TelescopeColor) do
+    for hl, col in pairs(OverrideColors) do
       vim.api.nvim_set_hl(0, hl, col)
     end
   end,

@@ -10,7 +10,7 @@ return {
   config = function()
     require('refactoring').setup {
       prompt_func_return_type = {
-        go = true,
+        go = false,
         java = false,
 
         cpp = false,
@@ -20,7 +20,7 @@ return {
         cxx = false,
       },
       prompt_func_param_type = {
-        go = true,
+        go = false,
         java = false,
 
         cpp = false,

@@ -359,17 +359,23 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
 
-      vim.keymap.set('n', '<leader>sf', function()
-        builtin.find_files(require('telescope.themes').get_dropdown {
-          file_ignore_patterns = ignoreFiles,
-          results_height = 100,
-          winblend = 0,
-          width = 1,
-          prompt_title = 'Files',
-          prompt_prefix = '> ',
-          previewer = false,
-        })
-      end, { desc = '[S]earch [F]iles' })
+      vim.keymap.set(
+        'n',
+        '<leader>sf',
+        builtin.find_files,
+        -- function()
+        --   builtin.find_files(require('telescope.themes').get_dropdown {
+        --     file_ignore_patterns = ignoreFiles,
+        --     results_height = 100,
+        --     winblend = 0,
+        --     width = 1,
+        --     prompt_title = 'Files',
+        --     prompt_prefix = '> ',
+        --     previewer = false,
+        --   })
+        -- end,
+        { desc = '[S]earch [F]iles' }
+      )
 
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
@@ -436,14 +442,14 @@ require('lazy').setup({
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP.
-      -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
+      -- NOTE: opts = {} is the same as calling require('fidget').setup({})
       { 'j-hui/fidget.nvim', opts = {} },
 
       -- Allows extra capabilities provided by nvim-cmp
       'hrsh7th/cmp-nvim-lsp',
     },
     config = function()
-      -- Brief aside: **What is LSP?**
+      -- Brief aside: What is LSP?
       --
       -- LSP is an initialism you've probably heard, but might not understand what it is.
       --
@@ -451,7 +457,7 @@ require('lazy').setup({
       -- and language tooling communicate in a standardized fashion.
       --
       -- In general, you have a "server" which is some tool built to understand a particular
-      -- language (such as `gopls`, `lua_ls`, `rust_analyzer`, etc.). These Language Servers
+      -- language (such as gopls, lua_ls, rust_analyzer, etc.). These Language Servers
       -- (sometimes called LSP servers, but that's kind of like ATM Machine) are standalone
       -- processes that communicate with some "client" - in this case, Neovim!
       --
@@ -463,14 +469,14 @@ require('lazy').setup({
       --  - and more!
       --
       -- Thus, Language Servers are external tools that must be installed separately from
-      -- Neovim. This is where `mason` and related plugins come into play.
+      -- Neovim. This is where mason and related plugins come into play.
       --
       -- If you're wondering about lsp vs treesitter, you can check out the wonderfully
-      -- and elegantly composed help section, `:help lsp-vs-treesitter`
+      -- and elegantly composed help section, :help lsp-vs-treesitter
 
       --  This function gets run when an LSP attaches to a particular buffer.
       --    That is to say, every time a new file is opened that is associated with
-      --    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
+      --    an lsp (for example, opening main.rs is associated with rust_analyzer) this
       --    function will be executed to configure the current buffer
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
@@ -500,7 +506,6 @@ require('lazy').setup({
           --  Useful when you're not sure what type a variable is and you want to see
           --  the definition of its *type*, not where it was *defined*.
           map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
-
           -- Fuzzy find all the symbols in your current document.
           --  Symbols are things like variables, functions, types, etc.
           map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
@@ -523,7 +528,7 @@ require('lazy').setup({
 
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
-          --    See `:help CursorHold` for information about when this is executed
+          --    See :help CursorHold for information about when this is executed
           --
           -- When you move your cursor, the highlights will be cleared (the second autocommand).
           local client = vim.lsp.get_client_by_id(event.data.client_id)
@@ -568,7 +573,6 @@ require('lazy').setup({
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
-
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --
@@ -577,18 +581,18 @@ require('lazy').setup({
       --  - filetypes (table): Override the default list of associated filetypes for the server
       --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
       --  - settings (table): Override the default settings passed when initializing the server.
-      --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+      --        For example, to see the options for lua_ls, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         -- clangd = {},
         gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
-        -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
+        -- ... etc. See :help lspconfig-all for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
         --    https://github.com/pmizio/typescript-tools.nvim
         --
-        -- But for many setups, the LSP (`tsserver`) will work just fine
+        -- But for many setups, the LSP (tsserver) will work just fine
         ts_ls = {},
         --
 
@@ -601,7 +605,7 @@ require('lazy').setup({
               completion = {
                 callSnippet = 'Replace',
               },
-              -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+              -- You can toggle below to ignore Lua_LS's noisy missing-fields warnings
               -- diagnostics = { disable = { 'missing-fields' } },
             },
           },
@@ -613,7 +617,7 @@ require('lazy').setup({
       --  other tools, you can run
       --    :Mason
       --
-      --  You can press `g?` for help in this menu.
+      --  You can press g? for help in this menu.
       require('mason').setup()
 
       -- You can add other tools here that you want Mason to install
@@ -638,7 +642,6 @@ require('lazy').setup({
       }
     end,
   },
-
   { -- Autoformat
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
@@ -897,6 +900,8 @@ require('lazy').setup({
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
   require 'kickstart.plugins.moonfly',
+  -- require 'kickstart.plugins.dracula',
+  -- require 'kickstart.plugins.tokionight',
   -- require 'kickstart.plugins.next-oceanic',
   -- require 'kickstart.plugins.edge',
   -- require 'kickstart.plugins.citruszest',
@@ -909,17 +914,18 @@ require('lazy').setup({
   require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  -- require 'kickstart.plugins.buffer_manager',
   require 'kickstart.plugins.harpoon',
   require 'kickstart.plugins.oil',
-  require 'kickstart.plugins.vim-be-good',
+  -- require 'kickstart.plugins.vim-be-good',
   require 'kickstart.plugins.lazy-git',
   require 'kickstart.plugins.vim-go',
   require 'kickstart.plugins.which-key',
-  -- require 'kickstart.plugins.indent_line',
-  require 'kickstart.plugins.refactoring',
-  -- require 'kickstart.plugins.nvlime',
   require 'kickstart.plugins.paredit',
-  require 'kickstart.plugins.elixir',
+  -- require 'kickstart.plugins.indent_line',
+  -- require 'kickstart.plugins.refactoring',
+  -- require 'kickstart.plugins.nvlime',
+  -- require 'kickstart.plugins.elixir',
   -- require 'kickstart.plugins.snacks',
   -- require 'kickstart.plugins.neoscroll',
 
