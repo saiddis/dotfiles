@@ -9,25 +9,26 @@
   "include": ["$XDG_CONFIG_HOME/waybar/includes/includes.json"],
   // Modules configuration
   "modules-left": [
-    "custom/launcher",
-    "hyprland/window",
-    "custom/text#two",
-    "custom/text#three",
-    "custom/help#macos",
+    //"custom/launcher",
+    "custom/mediaplayer",
+    "custom/cava"
+    //"custom/text#three",
+    // "custom/help#macos"
+    //"custom/text#two",
   ],
-  "modules-center": [
-    "clock#date",
-    "clock",
-  ],
+  //"modules-center": [
+  //  "hyprland/window"
+  //],
   "modules-right": [
     "idle_inhibitor",
     "battery",
+    //"tray",
+    "clock",
     "custom/notification"
     //"custom/gpuinfo",
     //"custom/cpuinfo",
     //"backlight",
     //"pulseaudio",
-    //"tray",
     //"memory",
     //"custom/power"
   ],
