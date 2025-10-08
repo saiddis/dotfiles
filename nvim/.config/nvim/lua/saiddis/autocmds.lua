@@ -1,0 +1,10 @@
+-- vim.api.nvim_create_autocmd('ModeChanged', {
+--   callback = function()
+--     local mode = vim.fn.mode()
+--     if mode:match '^i' then
+--       vim.diagnostic.enable(false)
+--     else
+--       vim.diagnostic.enable(true)
+--     end
+--   end,
+-- })
