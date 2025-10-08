@@ -1,0 +1,54 @@
+{
+  "For loop": {
+    "prefix": "for",
+    "body": [
+      "for i := ${1:init_value}; i < ${2:stop value}; i++ {",
+      "  fmt.Println(\"i: \", ${3:body})",
+      "}",
+      ""
+    ],
+    "description": "For loop"
+  },
+
+  "Handle error": {
+    "prefix": "if",
+    "body": [
+      "if err != nil {",
+      "        ${1:body}",
+      "}",
+      ""
+    ],
+    "description": "Handle error"
+  },
+  "Handle and return error": {
+    "prefix": "ifr",
+    "body": [
+      "if err != nil {",
+      "        return ${1:nil}, err",
+      "}",
+      ""
+    ],
+    "description": "Handle and return error"
+  },
+  "Handle inline error": {
+    "prefix": "iff",
+    "body": [
+      "if err := ${1:f}; err != nil {",
+      "        ${2:body}",
+      "}",
+      ""
+    ],
+    "description": "Handle inline error"
+  },
+
+  "Handle inline error and return": {
+    "prefix": "iffr",
+    "body": [
+      "if err := {${1:f}; err != nil {",
+      "        return ${2:nil}, err",
+      "}",
+      ""
+    ],
+    "description": "Handle inline error and return"
+  }
+}
