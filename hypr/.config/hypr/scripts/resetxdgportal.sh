@@ -13,6 +13,6 @@ else
 fi
 
 # We will run it safely as a service!
-./app2unit.sh -t service $libDir/xdg-desktop-portal-hyprland
+/home/saiddis/.config/hypr/scripts/app2unit.sh -t service $libDir/xdg-desktop-portal-hyprland
 sleep 1
-./app2unit.sh -t service $libDir/xdg-desktop-portal &
+/home/saiddis/.config/hypr/scripts/app2unit.sh -t service $libDir/xdg-desktop-portal &

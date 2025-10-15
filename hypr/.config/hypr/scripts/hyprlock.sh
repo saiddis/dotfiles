@@ -41,6 +41,7 @@ fn_mpris() {
   if [[ "${player_status}" == "Playing" ]]; then
     playerctl -p "${player}" metadata --format "{{xesam:title}} $(mpris_icon "${player}")  {{xesam:artist}}"
     mpris_thumb "${player}" "${thumb}"
+    # pkill -USR2 hyprlock >/dev/null 2>&1 # updates the mpris thumbnail
   else
     cp -f "$HOME/.face.icon" "${thumb}.png"
     exit 1
@@ -75,6 +76,7 @@ mpris_thumb() {
   if [ -n "$artUrl" ]; then
     curl -Ls -o "${thumb}.art" "$artUrl"
     magick "${thumb}.art" -quality 50 "${thumb}.png"
+    # pkill -USR2 hyprlock >/dev/null 2>&1 # updates the mpris thumbnail
   fi
 }
 

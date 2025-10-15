@@ -8,7 +8,7 @@ del_mode=false
 paste_string() {
     if ! command -v wtype >/dev/null; then exit 0; fi
     if [ -t 1 ]; then return 0; fi
-    ignore_paste_file="$HYDE_STATE_HOME/ignore.paste"
+    ignore_paste_file="$XDG_STATE_HOME/ignore.paste"
 
     if [[ ! -e "${ignore_paste_file}" ]]; then
         cat <<EOF >"${ignore_paste_file}"
@@ -117,7 +117,7 @@ check_content() {
         cliphist decode <<<"$line" | wl-copy
         local img_idx
         img_idx=$(awk -F '\t' '{print $1}' <<<"$line")
-        local temp_preview="${XDG_RUNTIME_DIR}/hyde/pastebin-preview_${img_idx}"
+        local temp_preview="${XDG_RUNTIME_DIR}/hypr/pastebin-preview_${img_idx}"
         wl-paste >"${temp_preview}"
         notify-send -a "Pastebin:" "Preview: ${img_idx}" -i "${temp_preview}" -t 2000
         return 1
@@ -146,17 +146,17 @@ setup_rofi_config() {
     # Rofi position
     rofi_position=$(get_rofi_pos)
 
-    # Hyprland border size
-    local hypr_width=${hypr_width:-"$(hyprctl -j getoption general:border_size | jq '.int')"}
-    local width=$((hypr_width * 3 / 2))
-
-    # Hyprland active border color with alpha
-    local hypr_color_full
-    hypr_color_full=$(hyprctl -j getoption general:col.active_border | jq -r '.custom' | awk '{print $1}')
-    local hypr_color="#${hypr_color_full:2}"  # Remove 0x, keep RRGGBBAA
+    # # Hyprland border size
+    # local hypr_width=${hypr_width:-"$(hyprctl -j getoption general:border_size | jq '.int')"}
+    # local width=$((hypr_width * 3 / 2))
+    #
+    # # Hyprland active border color with alpha
+    # local hypr_color_full
+    # hypr_color_full=$(hyprctl -j getoption general:col.active_border | jq -r '.custom' | awk '{print $1}')
+    # local hypr_color="#${hypr_color_full:2}"  # Remove 0x, keep RRGGBBAA
 
     # Rofi override string
-    r_override="window{border:${width}px;border-radius:${wind_border}px;border-color:${hypr_color};} \
+    r_override="window{border-radius:${wind_border}px;} \
 wallbox{border-radius:${elem_border}px;} \
 element{border-radius:${elem_border}px;}"
 }
