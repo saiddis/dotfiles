@@ -1,8 +1,7 @@
 theme = Builtin Tango Dark
 
-font-family = CaskaydiaCove Nerd Font
+font-family = Maple Mono
 
-background-opacity = 1.0
 font-size = 13.0
 background = #000000
 gtk-titlebar = false
