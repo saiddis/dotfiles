@@ -53,9 +53,9 @@ return {
     colors.orchid = '#F77AB8'
 
     colors.bg = '#000000'
-    colors.black = '#0C1518'
+    colors.black = '#0E1114'
     colors.white = '#d6deeb'
-    colors.grey15 = '#1B2327'
+    colors.grey15 = '#1B1A27'
     colors.green = '#B1E268'
     colors.lime = '#25FF5F'
     colors.emerald = '#5ADA7C'
