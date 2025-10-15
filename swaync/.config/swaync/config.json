@@ -1,11 +1,11 @@
 {
   "$schema": "",
   "positionX": "right",
-  "ignore-gtk-theme": true,
+  "ignore-gtk-theme": false,
   "positionY": "top",
   "cssPriority": "user",
-  "fit-to-screen": true,
-  "control-center-width": 400,
+  "fit-to-screen": false,
+  "control-center-width": 362,
   "control-center-height": 300,
   "control-center-margin-top": 2,
   "control-center-margin-bottom": 2,
@@ -61,19 +61,19 @@
       "actions": [
         {
           "label": "  󱛆  ",
-          "command": "nm-connection-editor"
+          "command": "/home/saiddis/.config/hypr/scripts/wifi-toggle.sh"
         },
         {
           "label": "    ",
-          "command": "blueman-manager"
+          "command": "/home/saiddis/.config/hypr/scripts/bluetooth-toggle.sh"
         },
         {
           "label": "  󰃛  ",
-          "command": " hyde-shell hyprsunset --toggle"
+          "command": "/home/saiddis/.config/hypr/scripts/hyprsunset.sh -t"
         },
         {
           "label": "  ⏻  ",
-          "command": "hyde-shell logoutlaunch"
+          "command": "/home/saiddis/.config/hypr/scripts/logoutlaunch.sh"
         }
       ]
     }
