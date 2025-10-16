@@ -6,14 +6,18 @@ return {
     require('marks').setup {
       default_mappings = false,
       mappings = {
-        set_next = 'm,',
         next = '<C-j>',
         prev = '<C-k>',
+        delete_buf = 'dm',
+        delete_line = '<C-m>',
+
         set_bookmark1 = 'm1',
+        delete_bookmark1 = 'd1',
         next_bookmark1 = '<C-n>',
-        preview = 'm:',
         prev_bookmark1 = '<C-p>',
-        delete_buf = 'dm<leader>',
+
+        preview = 'm:',
+        set_next = 'm,',
       },
     }
   end,
