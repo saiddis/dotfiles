@@ -11,4 +11,12 @@ return {
     '.git',
   },
   filetypes = { 'lua' },
+  settings = {
+    Lua = {
+      workspace = {
+        checkThirdParty = false,
+        ignoreDir = { '/home' },
+      },
+    },
+  },
 }
