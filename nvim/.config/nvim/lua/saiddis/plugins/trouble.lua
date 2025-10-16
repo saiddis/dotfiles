@@ -18,15 +18,15 @@ return {
     {
       '<leader>d',
       '<cmd>Trouble diagnostics toggle<cr>',
-      desc = 'Diagnostics (Trouble)',
     },
+    desc = 'Diagnostics (Trouble)',
     {
       '<leader>x',
       '<cmd>Trouble diagnostics toggle filter.buf=0<cr>',
       desc = 'Buffer Diagnostics (Trouble)',
     },
     {
-      '<leader>m',
+      '<leader>s',
       '<cmd>Trouble symbols toggle focus=false<cr>',
       desc = 'Symbols (Trouble)',
     },
