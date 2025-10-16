@@ -44,7 +44,7 @@
   "Handle inline error and return": {
     "prefix": "iffr",
     "body": [
-      "if err := {${1:f}; err != nil {",
+      "if err := ${1:f}; err != nil {",
       "        return ${2:nil}, err",
       "}",
       ""
