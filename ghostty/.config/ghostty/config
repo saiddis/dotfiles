@@ -1,9 +1,8 @@
-theme = Builtin Tango Dark
+theme = Moonfly
 
 font-family = Maple Mono
 
 font-size = 13.0
-background = #000000
 gtk-titlebar = false
 cursor-color = #25FF5F
 mouse-hide-while-typing = true
@@ -14,6 +13,8 @@ keybind = alt=toggle_secure_input
 keybind = ctrl+t=new_tab
 keybind = alt+p=previous_tab
 keybind = alt+n=next_tab
+
+keybind = ctrl+shift+n=unbind
 
 keybind = alt+w=new_split:auto
 keybind = alt+h=goto_split:left
