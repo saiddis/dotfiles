@@ -24,10 +24,10 @@
   "modules-right": [
     // "hyprland/window",
     "idle_inhibitor",
+    "group/hide-tray",
     "battery",
-    // "tray",
-    "clock"
-    // "custom/notification"
+    "clock",
+    "custom/notification"
     //"custom/gpuinfo",
     //"custom/cpuinfo",
     //"backlight",
@@ -76,26 +76,12 @@
       "^(?!.*\\S).*": "Finder"
     }
   },
-  "custom/launcher": {
-    "format": "",
-    "on-click": "hyde-shell rofilaunch"
-  },
-  "custom/text#two": {
-    "format": "File",
+  "custom/thunderbird": {
+    "format": "✉",
+    "tooltip": false,
     "interval": 60,
     "return-type": "plain",
-    "on-click": "hyde-shell hyde-launch --fall dolphin file-manager" //or you favorite Filer Explorer
-  },
-  "custom/text#three": {
-    "format": "Edit",
-    "interval": 60,
-    "return-type": "plain",
-    "on-click": "gimp" // or you favorite Image editor
-  },
-  "custom/text#four": {
-    "format": "View",
-    "interval": 60,
-    "return-type": "plain"
+    "on-click": "thunderbird"
   },
   "custom/notification": {
     "tooltip": false,

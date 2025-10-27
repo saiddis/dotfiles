@@ -10,7 +10,7 @@
     "modules": ["custom/dropdown#arrow", "tray"]
   },
   "custom/dropdown#arrow": {
-    "format": "<span size='large'></span> ",
+    "format": "<span></span>",
     "tooltip": true,
     "tooltip-format": "Reveal tray"
     
