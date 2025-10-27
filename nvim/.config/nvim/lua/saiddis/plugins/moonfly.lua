@@ -52,10 +52,11 @@ return {
     colors.lavender = '#B9B9FA'
     colors.orchid = '#F77AB8'
 
-    colors.bg = '#000000'
-    colors.black = '#0E1114'
+    -- colors.bg = '#000000'
     colors.white = '#d6deeb'
-    colors.grey15 = '#1B1A27'
+    -- colors.grey15 = colors.grey7
+    -- colors.grey7 = '#121212'
+    colors.black = '#000000'
     colors.green = '#B1E268'
     colors.lime = '#25FF5F'
     colors.emerald = '#5ADA7C'
@@ -73,12 +74,12 @@ return {
 
     local OverrideColors = {
       TelescopeMatching = { fg = colors.coral },
-      TelescopeSelection = { fg = colors.purple, bg = colors.grey15, bold = true },
+      TelescopeSelection = { fg = colors.purple, bg = colors.grey7 },
       TelescopePromptPrefix = { bg = colors.black },
-      TelescopePromptNormal = { bg = colors.grey15 },
+      TelescopePromptNormal = { bg = colors.black },
+      TelescopePromptBorder = { bg = colors.black, fg = colors.black },
       TelescopeResultsNormal = { bg = colors.black },
       TelescopePreviewNormal = { bg = colors.black },
-      TelescopePromptBorder = { bg = colors.grey15, fg = colors.grey15 },
       TelescopeResultsBorder = { bg = colors.black, fg = colors.black },
       TelescopePreviewBorder = { bg = colors.black, fg = colors.black },
       TelescopePromptTitle = { bg = colors.mineral, fg = colors.emerald },
@@ -94,6 +95,7 @@ return {
       GitSignsCurrentLineBlame = { fg = colors.crimson, bg = colors.black, bold = true },
 
       FloatBorder = { bg = colors.black, fg = colors.black },
+      FloatTitle = { fg = colors.black, bg = colors.black },
       NormalFloat = { bg = colors.black },
       CursorLineNr = { bg = colors.grey15, fg = colors.emerald, bold = true },
       CursorLine = { bg = colors.grey15, bold = false },
