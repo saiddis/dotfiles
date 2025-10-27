@@ -1,20 +1,31 @@
 :root {
-  --cc-bg: rgba(0, 0, 0, 0.5);
+  --cc-bg: rgba(0, 0, 0, 0.6);
+  /* --noti-border-color: rgba(255, 255, 255, 0.15); */
+  /* --noti-bg: 48, 48, 48; */
+  /* --noti-bg-alpha: 0.8; */
+  /* --noti-bg-darker: rgb(38, 38, 38); */
+  /* --noti-bg-hover: rgb(56, 56, 56); */
+  /* --noti-bg-focus: rgba(27, 26, 39, 0.9); */
+  /* --noti-close-bg: rgb(78, 78, 78); */
+  /* --noti-close-bg-hover: rgb(94, 94, 94); */
+  /* --text-color: rgb(255, 255, 255); */
+  /* --text-color-disabled: rgb(150, 150, 150); */
+  /* --bg-selected: rgb(0, 128, 255); */
+  /* --notification-icon-size: 64px; */
+  /* --notification-app-icon-size: calc(var(--notification-icon-size) / 3); */
+  /* --notification-group-icon-size: 32px; */
+
   --noti-border-color: rgba(255, 255, 255, 0.15);
   --noti-bg: 48, 48, 48;
   --noti-bg-alpha: 0.8;
   --noti-bg-darker: rgb(38, 38, 38);
   --noti-bg-hover: rgb(56, 56, 56);
-  /* --noti-bg-focus: rgba(174, 129, 255, 0.5); */
-  --noti-bg-focus: rgba(27, 26, 39, 0.9);
-  --noti-close-bg: rgb(78, 78, 78);
-  --noti-close-bg-hover: rgb(94, 94, 94);
-  --text-color: rgb(255, 255, 255);
-  --text-color-disabled: rgb(150, 150, 150);
-  --bg-selected: rgb(0, 128, 255);
-  --notification-icon-size: 64px;
-  --notification-app-icon-size: calc(var(--notification-icon-size) / 3);
-  --notification-group-icon-size: 32px;
+  --noti-bg-focus: rgba(45, 40, 90, 0.5);
+  --noti-br-focus: rgba(45, 40, 90, 1);
+  --noti-close-bg: rgba(56, 56, 56, 1);
+  --noti-close-bg-hover: rgba(0, 0, 0, 1);
+  --text-color: rgba(214, 222, 235, 1);
+  --text-color-disabled: rgba(150, 150, 150, 1);
 }
 
 
@@ -222,6 +233,7 @@
 
 .notification-group:focus {
   background: var(--noti-bg-focus);
+  border-radius: 12px;
 }
 
 .notification-group.low {
