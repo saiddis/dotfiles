@@ -5,12 +5,7 @@ killall -e xdg-desktop-portal-hyprland
 killall -e xdg-desktop-portal
 sleep 1
 
-# Use different directory on NixOS
-if [ -d /run/current-system/sw/libexec ]; then
-    libDir=/run/current-system/sw/libexec
-else
-    libDir=/usr/lib
-fi
+libDir=/usr/lib
 
 # We will run it safely as a service!
 /home/saiddis/.config/hypr/scripts/app2unit.sh -t service $libDir/xdg-desktop-portal-hyprland
