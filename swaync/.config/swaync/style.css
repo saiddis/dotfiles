@@ -1,5 +1,5 @@
 :root {
-  --cc-bg: rgba(0, 0, 0, 0.6);
+  --cc-bg: rgba(28, 27, 39, 0.8);
   /* --noti-border-color: rgba(255, 255, 255, 0.15); */
   /* --noti-bg: 48, 48, 48; */
   /* --noti-bg-alpha: 0.8; */
@@ -20,8 +20,8 @@
   --noti-bg-alpha: 0.8;
   --noti-bg-darker: rgb(38, 38, 38);
   --noti-bg-hover: rgb(56, 56, 56);
-  --noti-bg-focus: rgba(45, 40, 90, 0.5);
-  --noti-br-focus: rgba(45, 40, 90, 1);
+  --noti-bg-focus: rgba(40, 42, 54, 0.9);
+  --noti-br-focus: rgba(40, 42, 54, 0.9);
   --noti-close-bg: rgba(56, 56, 56, 1);
   --noti-close-bg-hover: rgba(0, 0, 0, 1);
   --text-color: rgba(214, 222, 235, 1);

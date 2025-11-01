@@ -1,6 +1,6 @@
 /* The name of the window itself */
 #window {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(28, 27, 39, 0.8);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
   border-radius: 1rem;
   font-size: 1.2rem;
@@ -45,7 +45,7 @@
 }
 #window #outer-box #scroll #inner-box #entry:selected {
   color: #fff;
-  background-color:rgba(45, 40, 90, 0.5);
-  border: 1px solid rgba(45, 40, 90, 1);
+  background-color:rgba(40, 42, 54, 0.9);
+  /* border: 1px solid rgba(189, 147, 249, 0.5); */
   outline: none;
 }
