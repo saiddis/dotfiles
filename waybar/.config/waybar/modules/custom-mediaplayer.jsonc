@@ -20,6 +20,7 @@
       "loop": "playerctl loop Playlist",
       "disable-loop": "playerctl loop None"
     },
-    "restart-interval": 5
+    "restart-interval": 5,
+    "max-length": 20
   }
 }

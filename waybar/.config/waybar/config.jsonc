@@ -3,35 +3,36 @@
   "layer": "top",
   "margin": 0,
   "position": "top",
-  "spacing": 10,
-  "border-size": 1,
-  "padding": 1,
+  "spacing": 5,
+  "border-size": 0,
+  "padding": 0,
   "include": ["/home/saiddis/.config/waybar/includes/includes.json"],
   // Modules configuration
   "modules-left": [
     //"custom/launcher",
-    "custom/gpuinfo",
-    "cpu",
-    "memory",
+    // "custom/gpuinfo",
+    // "cpu",
+    // "memory",
+    // "group/hide-tray",
+    "tray",
+    "backlight",
+    "pulseaudio",
+    "custom/mediaplayer",
     "custom/cava"
     //"custom/text#three",
     // "custom/help#macos"
     //"custom/text#two",
   ],
   "modules-center": [
-    "custom/mediaplayer"
+    "hyprland/window",
   ],
   "modules-right": [
-    // "hyprland/window",
     "idle_inhibitor",
-    "group/hide-tray",
     "battery",
     "clock",
     "custom/notification"
     //"custom/gpuinfo",
     //"custom/cpuinfo",
-    //"backlight",
-    //"pulseaudio",
     //"memory",
     //"custom/power"
   ],
@@ -68,14 +69,14 @@
       "on-scroll-down": "shift_down"
     }
   },
-  "hyprland/window": {
-    "format": "{class}",
-    "max-length": 20,
-    "rewrite": {
-      // if any window is focused display Finder
-      "^(?!.*\\S).*": "Finder"
-    }
-  },
+  // "hyprland/window": {
+  //   "format": "{class}",
+  //   "max-length": 20,
+  //   "rewrite": {
+  //     // if any window is focused display Finder
+  //     "^(?!.*\\S).*": "Finder"
+  //   }
+  // },
   "custom/thunderbird": {
     "format": "✉",
     "tooltip": false,

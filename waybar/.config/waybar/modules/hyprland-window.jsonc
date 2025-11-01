@@ -1,6 +1,6 @@
 {
     "hyprland/window": {
-        "format": " \uf303 {0}",
+        "format": "{0}",
         "rotate": 0,
         "separate-outputs": true,
         "rewrite": {
@@ -22,7 +22,8 @@
             "(.*)Github": "Github \ue709 ",
             "(.*)Spotify Free": "Spotify \udb81\udcc7 ",
             "(.*)Spotify Premiun": "Spotify \udb81\udcc7 "
+            // "^(?!.*\\S).*": "\uf303 "
         },
-        "max-length": 50
+        "max-length": 100
     }
 }

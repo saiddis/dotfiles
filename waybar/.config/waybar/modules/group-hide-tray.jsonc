@@ -4,13 +4,13 @@
     "drawer": {
       "transition-duration": "0.5",
       "children-class": "hide-tray-drawer",
-      "transition-left-to-right": false,
+      "transition-left-to-right": true,
       "click-to-reveal": true
     },
     "modules": ["custom/dropdown#arrow", "tray"]
   },
   "custom/dropdown#arrow": {
-    "format": "<span></span>",
+    "format": "<span></span> ",
     "tooltip": true,
     "tooltip-format": "Reveal tray"
     
