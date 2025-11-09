@@ -24,6 +24,6 @@
             "(.*)Spotify Premiun": "Spotify \udb81\udcc7 "
             // "^(?!.*\\S).*": "\uf303 "
         },
-        "max-length": 100
+        "max-length": 70
     }
 }

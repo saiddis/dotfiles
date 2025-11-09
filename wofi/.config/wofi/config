@@ -1,5 +1,5 @@
-# allow_images=true
-# image_size=24
+allow_images=true
+image_size=24
 prompt=
 hide_scroll=true
 width=30%

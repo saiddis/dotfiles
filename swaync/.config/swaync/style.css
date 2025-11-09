@@ -1,5 +1,5 @@
 :root {
-  --cc-bg: rgba(28, 27, 39, 0.8);
+  --cc-bg: rgba(0,0,0,0.8);
   /* --noti-border-color: rgba(255, 255, 255, 0.15); */
   /* --noti-bg: 48, 48, 48; */
   /* --noti-bg-alpha: 0.8; */
@@ -20,11 +20,12 @@
   --noti-bg-alpha: 0.8;
   --noti-bg-darker: rgb(38, 38, 38);
   --noti-bg-hover: rgb(56, 56, 56);
-  --noti-bg-focus: rgba(40, 42, 54, 0.9);
+  --noti-bg-focus: rgba(50, 52, 55,0.6);
   --noti-br-focus: rgba(40, 42, 54, 0.9);
   --noti-close-bg: rgba(56, 56, 56, 1);
   --noti-close-bg-hover: rgba(0, 0, 0, 1);
-  --text-color: rgba(214, 222, 235, 1);
+  --noti-text-color:  rgba(127, 219, 202, 1);
+  --text-color: rgba(37, 255, 95, 1);
   --text-color-disabled: rgba(150, 150, 150, 1);
 }
 
@@ -141,7 +142,8 @@
   font-size: 16px;
   font-weight: bold;
   background: transparent;
-  color: var(--text-color);
+  /* color: var(--text-color); */
+  color: var(--noti-text-color);
   text-shadow: none;
 }
 
@@ -150,7 +152,8 @@
   font-size: 16px;
   font-weight: bold;
   background: transparent;
-  color: var(--text-color);
+  /* color: var(--text-color); */
+  color: var(--noti-text-color);
   text-shadow: none;
   margin-right: 30px;
 }
@@ -160,7 +163,8 @@
   font-size: 15px;
   font-weight: normal;
   background: transparent;
-  color: var(--text-color);
+  /* color: var(--text-color); */
+  color: var(--noti-text-color);
   text-shadow: none;
 }
 
@@ -304,7 +308,7 @@
   /* The Control Center which contains the old notifications + widgets */
   background: var(--cc-bg);
   color: var(--text-color);
-  border-radius: 12px;
+  border-radius: 20px;
 }
 
 .control-center .control-center-list-placeholder {
@@ -446,12 +450,13 @@
 
 /* Buttons widget */
 .widget-buttons-grid {
-  padding: 8px;
+  padding: 8px 14px 8px 22px;
   margin: 8px;
   border-radius: 12px;
 }
 
 .widget-buttons-grid flowboxchild > button {
+  color: var(--text-color);
   border-radius: 12px;
 }
 
@@ -461,6 +466,7 @@
 
 /* Menubar widget */
 .widget-menubar {
+  color: var(--text-color);
   /* The revealer buttons */
   /* .AnyName { Name defined in config after #
     background-color: rgba(var(--noti-bg), 1.0);
@@ -480,6 +486,7 @@
 }
 
 .widget-menubar > .menu-button-bar {
+  color: var(--text-color);
   /* The left button container */
   /* The right button container */
   /* The left and right button container */
@@ -494,6 +501,7 @@
 }
 
 .widget-menubar > .menu-button-bar > .widget-menubar-container button {
+  color: var(--text-color);
   border-radius: 12px;
   margin: 0 4px;
 }
