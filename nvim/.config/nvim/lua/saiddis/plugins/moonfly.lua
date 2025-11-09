@@ -73,18 +73,34 @@ return {
     vim.cmd [[colorscheme moonfly]]
 
     local OverrideColors = {
-      TelescopeMatching = { fg = colors.coral },
-      TelescopeSelection = { fg = colors.purple, bg = colors.grey7 },
-      TelescopePromptPrefix = { bg = colors.black },
-      TelescopePromptNormal = { bg = colors.black },
-      TelescopePromptBorder = { bg = colors.black, fg = colors.black },
-      TelescopeResultsNormal = { bg = colors.black },
-      TelescopePreviewNormal = { bg = colors.black },
-      TelescopeResultsBorder = { bg = colors.black, fg = colors.black },
-      TelescopePreviewBorder = { bg = colors.black, fg = colors.black },
-      TelescopePromptTitle = { bg = colors.mineral, fg = colors.emerald },
-      TelescopeResultsTitle = { bg = colors.mineral, fg = colors.emerald },
-      TelescopePreviewTitle = { bg = colors.mineral, fg = colors.emerald },
+      -- TelescopeMatching = { fg = colors.coral },
+      -- TelescopeSelection = { fg = colors.purple, bg = colors.grey7 },
+      -- TelescopePromptPrefix = { bg = colors.black },
+      -- TelescopePromptNormal = { bg = colors.black },
+      -- TelescopePromptBorder = { bg = colors.black, fg = colors.black },
+      -- TelescopeResultsNormal = { bg = colors.black },
+      -- TelescopePreviewNormal = { bg = colors.black },
+      -- TelescopeResultsBorder = { bg = colors.black, fg = colors.black },
+      -- TelescopePreviewBorder = { bg = colors.black, fg = colors.black },
+      -- TelescopePromptTitle = { bg = colors.mineral, fg = colors.emerald },
+      -- TelescopeResultsTitle = { bg = colors.mineral, fg = colors.emerald },
+      -- TelescopePreviewTitle = { bg = colors.mineral, fg = colors.emerald },
+      --
+      -- Matching and Selection
+      SnacksPickerMatch = { fg = colors.coral },
+      SnacksPickerSelected = { fg = colors.purple, bg = colors.grey7, bold = true },
+      -- Prompt highlights
+      SnacksPickerInput = { bg = colors.black },
+      SnacksPickerInputBorder = { bg = colors.black, fg = colors.black },
+      SnacksPickerInputTitle = { bg = colors.mineral, fg = colors.emerald },
+      -- Results highlights
+      SnacksPickerList = { bg = colors.black },
+      SnacksPickerListBorder = { bg = colors.black, fg = colors.black },
+      SnacksPickerListTitle = { bg = colors.mineral, fg = colors.emerald },
+      -- Preview highlights
+      SnacksPickerPreview = { bg = colors.black },
+      SnacksPickerPreviewBorder = { bg = colors.black, fg = colors.black },
+      SnacksPickerPreviewTitle = { bg = colors.mineral, fg = colors.emerald },
 
       GitSignsAdd = { fg = colors.lime, bg = colors.black, bold = true },
       GitSignsChange = { fg = colors.violet, bg = colors.black, bold = true },
@@ -95,14 +111,14 @@ return {
       GitSignsCurrentLineBlame = { fg = colors.crimson, bg = colors.black, bold = true },
 
       FloatBorder = { bg = colors.black, fg = colors.black },
-      FloatTitle = { fg = colors.black, bg = colors.black },
+      FloatTitle = { fg = colors.emerald, bg = colors.mineral },
       NormalFloat = { bg = colors.black },
       CursorLineNr = { bg = colors.grey15, fg = colors.emerald, bold = true },
       CursorLine = { bg = colors.grey15, bold = false },
       CursorLineSign = { bg = colors.grey15 },
       LineNr = { fg = colors.mineral, bg = colors.black },
       SignColumn = { fg = colors.mineral, bg = colors.black },
-      Directory = { fg = colors.emerald, bold = true },
+      -- Directory = { fg = colors.emerald, bold = true },
 
       -- String = { fg = colors.yellow },
     }
