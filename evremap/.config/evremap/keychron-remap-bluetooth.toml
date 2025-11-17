@@ -1,4 +1,4 @@
-device_name = " Keychron K1 Version 6 Keyboard"
+device_name = "Keychron K1 Version 6 Keyboard"
 
 [[dual_role]]
 input = "KEY_CAPSLOCK"
