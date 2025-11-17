@@ -24,8 +24,8 @@
   --noti-br-focus: rgba(40, 42, 54, 0.9);
   --noti-close-bg: rgba(56, 56, 56, 1);
   --noti-close-bg-hover: rgba(0, 0, 0, 1);
-  --noti-text-color:  rgba(127, 219, 202, 1);
-  --text-color: rgba(37, 255, 95, 1);
+  --noti-text-color:  rgba(37, 255, 95, 1);
+  --text-color: rgba(214, 222, 235, 0.9);
   --text-color-disabled: rgba(150, 150, 150, 1);
 }
 
@@ -450,7 +450,7 @@
 
 /* Buttons widget */
 .widget-buttons-grid {
-  padding: 8px 14px 8px 22px;
+  padding: 8px;
   margin: 8px;
   border-radius: 12px;
 }
