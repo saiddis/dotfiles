@@ -12,7 +12,7 @@
 }
 #window #outer-box #input {
   background-color: rgba(0, 0, 0, 0.7);
-  color: #25FF5F;
+  color: #ffffff;
   border: none;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   padding: 0.8rem 1rem;
@@ -34,7 +34,7 @@
 }
 #window #outer-box #scroll #inner-box #entry {
   /* color: rgba(214, 222, 235, 1); */
-  color: #7fdbca;
+  color: rgba(214, 222, 235, 0.9);
   background-color: rgba(0, 0, 0, 0.1);
   padding: 0.6rem 1rem;
   /* The name of all images in entries displayed in image mode */
@@ -45,7 +45,7 @@
   margin-right: 0.5rem;
 }
 #window #outer-box #scroll #inner-box #entry:selected {
-  color: #25FF5F;
+  color: #ffffff;
   background-color:rgba(50, 52, 55,0.6);
   /* border: 1px solid rgba(189, 147, 249, 0.5); */
   outline: none;
