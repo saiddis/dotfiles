@@ -3,7 +3,7 @@
 	"dbus": {
 		"enabled": true,
 		"connect_timeout": "20s",
-		"connect_interval": "0.200s",
+		"connect_interval": "1s",
 		"notifications": {
 			"enabled": true
 		},
@@ -49,11 +49,11 @@
 						"icon_size": 36,
 						"active_workspace_only": false,
 						"active_monitor_only": false,
-						"group_tasks": false,
+						"group_tasks": true,
 						"hide_indicators": true,
 						"expand": true,
 						"max_size": 0,
-						"pinned": ["firefox"],
+						"pinned": ["thunderbird", "discord", "firefox", "obsidian", "gimp", "zed"],
 						"preview_width": 256
 					}
 				},
@@ -65,7 +65,7 @@
 				},
 				{
 					"systray": {
-						"icon_size": 24,
+						"icon_size": 22,
 						"menu_icon_size": 20,
 						"auto_hide_statuses": [
 							"STATUS_UNSPECIFIED",
@@ -85,8 +85,8 @@
 				},
 				{
 					"power": {
-						"icon_size": 25,
-						"icon_symbolic": false
+						"icon_size": 24,
+						"icon_symbolic": true
 					}
 				},
 				{
@@ -109,14 +109,14 @@
 				},
 				{
 					"spacer": {
-						"size": 22,
+						"size": 16,
 						"expand": false
 					}
 				},
 				{
 					"audio": {
 						"icon_size": 24,
-						"icon_symbolic": true,
+						"icon_symbolic": false,
 						"command_mixer": "pavucontrol",
 						"enable_source": true
 					}
@@ -143,9 +143,9 @@
 						"overlay_icon_size": 96,
 						"overlay_icon_symbolic": true,
 						"command_logout": "loginctl terminate-session $XDG_SESSION_ID",
-						"command_reboot": "systemctl reboot",
-						"command_suspend": "systemctl suspend",
-						"command_shutdown": "systemctl poweroff"
+						"command_reboot": "reboot",
+						"command_suspend": "suspend",
+						"command_shutdown": "poweroff"
 					}
 				},
 				{

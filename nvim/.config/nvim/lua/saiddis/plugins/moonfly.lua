@@ -102,7 +102,7 @@ return {
       SnacksPickerPreviewBorder = { bg = colors.black, fg = colors.black },
       SnacksPickerPreviewTitle = { bg = colors.mineral, fg = colors.emerald },
 
-      GitSignsAdd = { fg = colors.lime, bg = colors.black, bold = true },
+      GitSignsAdd = { fg = colors.emerald, bg = colors.black, bold = true },
       GitSignsChange = { fg = colors.violet, bg = colors.black, bold = true },
       GitSignsDelete = { fg = colors.crimson, bg = colors.black, bold = true },
       GitSignsTopDelete = { fg = colors.crimson, bg = colors.black, bold = true },

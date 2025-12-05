@@ -9,7 +9,7 @@ palette = 10=#E593EE
 
 font-family = Maple Mono
 
-font-size = 14.0
+font-size = 13.0
 gtk-titlebar = false
 cursor-color = #25FF5F
 mouse-hide-while-typing = true
