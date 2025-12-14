@@ -20,6 +20,9 @@
 			"enable_logind": true,
 			"hud_notifications": true
 		},
+		"idle_inhibitor": {
+			"enabled": true
+		},
 		"power": {
 			"enabled": true,
 			"low_percent": 10,
@@ -80,6 +83,19 @@
 				{
 					"spacer": {
 						"size": 16,
+						"expand": false
+					}
+				},
+				{
+					"idle_inhibitor": {
+						"icon_size": 20,
+						"icon_symbolic": true
+
+					}
+				},
+				{
+					"spacer": {
+						"size": 20,
 						"expand": false
 					}
 				},
