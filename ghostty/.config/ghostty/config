@@ -7,9 +7,9 @@ selection-foreground = #080808
 palette = 2=#25FF5F
 palette = 10=#E593EE
 
-font-family = Maple Mono
+font-family = Hack Nerd Font
 
-font-size = 13.0
+font-size = 12.0
 gtk-titlebar = false
 cursor-color = #25FF5F
 mouse-hide-while-typing = true
