@@ -52,11 +52,11 @@ return {
     colors.lavender = '#B9B9FA'
     colors.orchid = '#F77AB8'
 
-    -- colors.bg = '#000000'
+    colors.bg = '#000000'
     colors.white = '#d6deeb'
-    -- colors.grey15 = colors.grey7
+    -- colors.grey15 = colors.grey8
     -- colors.grey7 = '#121212'
-    colors.black = '#000000'
+    -- colors.black = '#000000'
     colors.green = '#B1E268'
     colors.lime = '#25FF5F'
     colors.emerald = '#5ADA7C'
@@ -88,18 +88,19 @@ return {
       --
       -- Matching and Selection
       SnacksPickerMatch = { fg = colors.coral },
-      SnacksPickerSelected = { fg = colors.purple, bg = colors.grey7, bold = true },
+      SnacksPickerSelected = { fg = colors.purple, bg = colors.grey15, bold = true },
       -- Prompt highlights
-      SnacksPickerInput = { bg = colors.black },
-      SnacksPickerInputBorder = { bg = colors.black, fg = colors.black },
+      SnacksPickerInput = { bg = colors.grey7 },
+      SnacksPickerPrompt = { bg = colors.grey7, fg = colors.emerald },
+      SnacksPickerInputBorder = { bg = colors.grey7, fg = colors.grey7 },
       SnacksPickerInputTitle = { bg = colors.mineral, fg = colors.emerald },
       -- Results highlights
-      SnacksPickerList = { bg = colors.black },
-      SnacksPickerListBorder = { bg = colors.black, fg = colors.black },
+      SnacksPickerList = { bg = colors.grey7 },
+      SnacksPickerListBorder = { bg = colors.grey7, fg = colors.grey7 },
       SnacksPickerListTitle = { bg = colors.mineral, fg = colors.emerald },
       -- Preview highlights
-      SnacksPickerPreview = { bg = colors.black },
-      SnacksPickerPreviewBorder = { bg = colors.black, fg = colors.black },
+      SnacksPickerPreview = { bg = colors.grey7 },
+      SnacksPickerPreviewBorder = { bg = colors.grey7, fg = colors.grey7 },
       SnacksPickerPreviewTitle = { bg = colors.mineral, fg = colors.emerald },
 
       GitSignsAdd = { fg = colors.emerald, bg = colors.black, bold = true },
@@ -110,9 +111,9 @@ return {
       GitSignsUntracked = { fg = colors.turquoise, bg = colors.black, bold = true },
       GitSignsCurrentLineBlame = { fg = colors.crimson, bg = colors.black, bold = true },
 
-      FloatBorder = { bg = colors.black, fg = colors.black },
+      FloatBorder = { bg = colors.grey7, fg = colors.grey7 },
       FloatTitle = { fg = colors.emerald, bg = colors.mineral },
-      NormalFloat = { bg = colors.black },
+      NormalFloat = { bg = colors.grey7 },
       CursorLineNr = { bg = colors.grey15, fg = colors.emerald, bold = true },
       CursorLine = { bg = colors.grey15, bold = false },
       CursorLineSign = { bg = colors.grey15 },
