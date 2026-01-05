@@ -11,9 +11,9 @@ return {
     explorer = { enabled = true, replace_netrw = true },
     indent = { enabled = true },
     input = { enabled = true },
-    notify = { enabled = true },
+    notify = { enabled = false },
     notifier = {
-      enabled = true,
+      enabled = false,
       timeout = 2000,
       width = { min = 40, max = 1000 },
       height = { min = 1, max = 1000 },
@@ -87,7 +87,7 @@ return {
         },
       },
     },
-    lazygit = { enabled = true },
+    lazygit = { enabled = false },
     quickfile = { enabled = true },
     scroll = { enabled = false },
     layout = { enabled = true },
@@ -101,6 +101,12 @@ return {
     -- animate = { enabled = true },
   },
   keys = {
+    {
+      'gl',
+      function()
+        Snacks.git.blame_line()
+      end,
+    },
     {
       '<leader><space>',
       function()
