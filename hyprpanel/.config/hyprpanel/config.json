@@ -44,19 +44,19 @@
 		{
 			"id": "panel0",
 			"edge": "EDGE_RIGHT",
-			"size": 48,
+			"size": 64,
 			"monitor": "",
 			"modules": [
 				{
 					"taskbar": {
-						"icon_size": 36,
+						"icon_size": 48,
 						"active_workspace_only": false,
 						"active_monitor_only": false,
 						"group_tasks": true,
 						"hide_indicators": true,
 						"expand": true,
 						"max_size": 0,
-						"pinned": ["thunderbird", "discord", "firefox", "obsidian", "gimp", "zed"],
+						"pinned": ["discord", "firefox",  "google-chrome","zen", "obsidian", "gimp", "zed"],
 						"preview_width": 256
 					}
 				},
@@ -68,8 +68,8 @@
 				},
 				{
 					"systray": {
-						"icon_size": 22,
-						"menu_icon_size": 20,
+						"icon_size": 26,
+						"menu_icon_size": 24,
 						"auto_hide_statuses": [
 							"STATUS_UNSPECIFIED",
 							"STATUS_PASSIVE",
@@ -82,32 +82,32 @@
 				},
 				{
 					"spacer": {
-						"size": 16,
-						"expand": false
-					}
-				},
-				{
-					"idle_inhibitor": {
-						"icon_size": 20,
-						"icon_symbolic": true
-
-					}
-				},
-				{
-					"spacer": {
 						"size": 20,
 						"expand": false
 					}
 				},
 				{
-					"power": {
+					"idle_inhibitor": {
 						"icon_size": 24,
+						"icon_symbolic": true,
+						"default_target": 1
+					}
+				},
+				{
+					"spacer": {
+						"size": 24,
+						"expand": false
+					}
+				},
+				{
+					"power": {
+						"icon_size": 26,
 						"icon_symbolic": true
 					}
 				},
 				{
 					"notifications": {
-						"icon_size": 24,
+						"icon_size": 28,
 						"notification_icon_size": 48,
 						"default_timeout": "7s",
 						"position": "POSITION_TOP_RIGHT",
@@ -125,21 +125,21 @@
 				},
 				{
 					"spacer": {
-						"size": 16,
+						"size": 20,
 						"expand": false
 					}
 				},
 				{
 					"audio": {
-						"icon_size": 24,
-						"icon_symbolic": false,
+						"icon_size": 28,
+						"icon_symbolic": true,
 						"command_mixer": "pavucontrol",
 						"enable_source": true
 					}
 				},
 				{
 					"spacer": {
-						"size": 16,
+						"size": 20,
 						"expand": false
 					}
 				},
@@ -154,7 +154,7 @@
 				},
 				{
 					"session": {
-						"icon_size": 24,
+						"icon_size": 28,
 						"icon_symbolic": true,
 						"overlay_icon_size": 96,
 						"overlay_icon_symbolic": true,
