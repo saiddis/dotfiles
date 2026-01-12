@@ -1,13 +1,14 @@
 theme = Moonfly
 
 foreground = #d6deeb
+background = #000000
 selection-background = #FFFF4A
-selection-foreground = #080808
+selection-foreground = #000000
 
 palette = 2=#25FF5F
 palette = 10=#E593EE
 
-font-family = Hack Nerd Font
+font-family = M+1Code Nerd Font
 
 font-size = 12.0
 gtk-titlebar = false
@@ -22,9 +23,14 @@ keybind = alt+p=previous_tab
 keybind = alt+n=next_tab
 
 keybind = ctrl+shift+n=unbind
+keybind = super+ctrl+bracket_right=unbind
+keybind = ctrl+tab=unbind
+keybind = ctrl+shift+tab=unbind
 
+keybind = ctrl+tab=goto_split:next
+keybind = ctrl+shift+tab=goto_split:previous
 keybind = alt+w=new_split:auto
-keybind = alt+h=goto_split:left
-keybind = alt+j=goto_split:bottom
-keybind = alt+k=goto_split:top
-keybind = alt+l=goto_split:right
+keybind = ctrl+shift+h=goto_split:left
+keybind = ctrl+shift+j=goto_split:bottom
+keybind = ctrl+shift+k=goto_split:top
+keybind = ctrl+shift+l=goto_split:right
