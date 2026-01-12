@@ -7,6 +7,8 @@ return {
 
     configs.setup {
       ensure_installed = {
+        'c',
+        'zig',
         'bash',
         'comment',
         'css',
