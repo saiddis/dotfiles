@@ -25,64 +25,87 @@ return {
     keymap = { enabled = true },
     image = { enabled = true },
     picker = {
-      sources = {
-        matcher = {
-          frecency = true,
-        },
-        select = {
-          layout = {
-            preset = 'telescope-custom',
-          },
-        },
-      },
-      ui_select = true,
-      enabled = true,
-      prompt = '  ',
+      prompt = '   ' .. ' ' .. ' ',
       layout = {
-        preset = 'telescope-custom',
+        cycle = true, -- go to top when reaching bottom and vice versa
+        preset = function()
+          return vim.o.columns >= 120 and 'ivy' or 'vscode'
+        end,
+        -- Improve the presets
+        layout = {
+          height = 0.9,
+          backdrop = true,
+          title_pos = 'center',
+        },
       },
-      layouts = {
-        ['telescope-custom-select'] = {
-          reverse = false,
-          layout = {
-            box = 'horizontal',
-            backdrop = false,
-            width = 0.5,
-            height = 2,
-            border = 'none',
-            {
-              box = 'vertical',
-              { win = 'input', height = 1, border = 'rounded', title = '{title} {live} {flags}', title_pos = 'center' },
-              {
-                win = 'list',
-                title = ' Results ',
-                title_pos = 'center',
-                border = 'rounded',
-                height = 30,
-              },
-            },
+      matcher = {
+        fuzzy = true, -- use fuzzy matching
+        smartcase = true, -- use smartcase
+        ignorecase = true, -- use ignorecase
+        sort_empty = false, -- sort results when the search string is empty
+        filename_bonus = true, -- give bonus for matching file names (last part of the path)
+        file_pos = true, -- support patterns like `file:line:col` and `file:line`
+        -- the bonusses below, possibly require string concatenation and path normalization,
+        -- so this can have a performance impact for large lists and increase memory usage
+        cwd_bonus = true, -- give bonus for matching files in the cwd
+        frecency = true, -- frecency bonus
+        history_bonus = true,
+      },
+      jump = {
+        jumplist = true, -- save the current position in the jumplist
+        tagstack = true, -- save the current position in the tagstack
+        reuse_win = true, -- reuse an existing window if the buffer is already open
+        close = true, -- close the picker when jumping/editing to a location (defaults to true)
+        match = false, -- jump to the first match position. (useful for `lines`)
+      },
+      formatters = {
+        text = {
+          ft = nil, ---@type string? filetype for highlighting
+        },
+        file = {
+          filename_first = true, -- display filename before the file path
+          truncate = 40, -- truncate the file path to (roughly) this length
+          filename_only = false, -- only show the filename
+        },
+        selected = {
+          show_always = true, -- only show the selected column when there are multiple selections
+          unselected = false, -- use the unselected icon for unselected items
+        },
+        severity = {
+          icons = true, -- show severity icons
+          level = false, -- show severity level
+        },
+      },
+      win = {
+        -- input window
+        input = {
+          keys = {
+            ['_'] = { 'edit_split', mode = { 'n' } },
+            ['|'] = { 'edit_vsplit', mode = { 'n' } },
+            ['<c-s>'] = { 'edit_split', mode = { 'i' } },
+            ['<c-v>'] = { 'edit_vsplit', mode = { 'i' } },
+            ['<c-l>'] = { 'loclist', mode = { 'n', 'i' } },
+            ['<C-w>'] = { { 'pick_win', 'jump' }, mode = { 'n', 'i' } },
           },
         },
-        ['telescope-custom'] = {
-          reverse = false,
-          layout = {
-            box = 'horizontal',
-            backdrop = false,
-            width = 0.8,
-            height = 0.9,
-            border = 'none',
-            {
-              box = 'vertical',
-              { win = 'input', height = 1, border = 'rounded', title = '{title} {live} {flags}', title_pos = 'center' },
-              { win = 'list', title = '', title_pos = 'center', border = 'rounded' },
-            },
-            {
-              win = 'preview',
-              title = '{preview:Preview}',
-              width = 0.53,
-              border = 'rounded',
-              title_pos = 'center',
-            },
+        list = {
+          keys = {
+            ['_'] = { 'edit_split' },
+            ['|'] = { 'edit_vsplit' },
+            ['<c-l>'] = { 'loclist' },
+            ['<C-w>'] = { { 'pick_win', 'jump' } },
+          },
+          wo = {
+            statuscolumn = ' ',
+            signcolumn = 'no',
+            -- foldcolumn = "no",
+          },
+        },
+        preview = {
+          wo = {
+            statuscolumn = ' ',
+            signcolumn = 'no',
+            -- foldcolumn = "no",
           },
         },
       },
@@ -101,6 +124,13 @@ return {
     -- animate = { enabled = true },
   },
   keys = {
+
+    {
+      '<leader>ss',
+      function()
+        Snacks.picker.highlights { pattern = 'hl_group:^Snacks' }
+      end,
+    },
     {
       'gl',
       function()
