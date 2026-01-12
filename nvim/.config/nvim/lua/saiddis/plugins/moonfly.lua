@@ -47,13 +47,13 @@ return {
 
     colors.purple = '#AE81FF'
     colors.violet = '#E593EE'
-    colors.cranberry = '#ff5874'
-    colors.red = '#fc514e'
-    colors.lavender = '#B9B9FA'
-    colors.orchid = '#F77AB8'
+    colors.cranberry = '#F77AB8'
+    colors.red = '#ff5874'
+    colors.lavender = '#a9b1d6'
+    colors.orchid = colors.cranberry
 
     colors.bg = '#000000'
-    colors.white = '#d6deeb'
+    colors.white = '#E7EAEE'
     -- colors.grey15 = colors.grey8
     -- colors.grey7 = '#121212'
     -- colors.black = '#000000'
@@ -63,9 +63,9 @@ return {
     colors.turquoise = '#7fdbca'
     colors.khaki = '#E6E666'
     colors.yellow = '#FDFD70'
-    colors.orange = '#FC9949'
-    colors.sky = '#70BDF5'
-    colors.blue = '#339CFF'
+    colors.orange = '#FFA064'
+    colors.blue = '#AFDBFD'
+    colors.sky = '#5CCEFF'
     colors.coral = '#FC9B7D'
 
     require('moonfly').custom_colors(colors)
@@ -89,6 +89,8 @@ return {
       -- Matching and Selection
       SnacksPickerMatch = { fg = colors.coral },
       SnacksPickerSelected = { fg = colors.purple, bg = colors.grey15, bold = true },
+      SnacksPickerListCursorLine = { bg = colors.grey15 },
+      SnacksPickerPreviewCursorLine = { bg = colors.grey15 },
       -- Prompt highlights
       SnacksPickerInput = { bg = colors.grey7 },
       SnacksPickerPrompt = { bg = colors.grey7, fg = colors.emerald },
@@ -102,6 +104,12 @@ return {
       SnacksPickerPreview = { bg = colors.grey7 },
       SnacksPickerPreviewBorder = { bg = colors.grey7, fg = colors.grey7 },
       SnacksPickerPreviewTitle = { bg = colors.mineral, fg = colors.emerald },
+
+      SnacksPickerBoxBorder = { bg = colors.grey7, fg = colors.grey7 },
+      SnacksWinSeparator = { bg = colors.grey7, fg = colors.grey7 },
+
+      SnacksPickerGitStatusModified = { fg = colors.cranberry },
+      SnacksPickerGitStatusChanged = { fg = colors.orange },
 
       GitSignsAdd = { fg = colors.emerald, bg = colors.black, bold = true },
       GitSignsChange = { fg = colors.violet, bg = colors.black, bold = true },
@@ -117,10 +125,15 @@ return {
       CursorLineNr = { bg = colors.grey15, fg = colors.emerald, bold = true },
       CursorLine = { bg = colors.grey15, bold = false },
       CursorLineSign = { bg = colors.grey15 },
-      LineNr = { fg = colors.mineral, bg = colors.black },
-      SignColumn = { fg = colors.mineral, bg = colors.black },
+      LineNr = { fg = colors.mineral, bg = colors.grey7 },
+      SignColumn = { fg = colors.mineral, bg = colors.grey7 },
+      Keyword = { fg = colors.red },
+      Operator = { fg = colors.cranberry },
+      Boolean = { fg = colors.green },
+      Conditional = { fg = colors.violet },
+      ['@keyword.import'] = { fg = colors.red },
+      -- Conditional = { fg = colors.cranberry },
       -- Directory = { fg = colors.emerald, bold = true },
-
       -- String = { fg = colors.yellow },
     }
 
