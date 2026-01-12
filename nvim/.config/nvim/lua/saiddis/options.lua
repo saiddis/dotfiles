@@ -114,6 +114,8 @@ vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower win
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 vim.lsp.enable {
+  'clangd',
+  'zls',
   'buf_ls',
   'deno',
   'gopls',
@@ -126,11 +128,11 @@ vim.lsp.enable {
 
 vim.opt.laststatus = 0 -- Or 3 for global statusline
 
-if vim.fn.has('wsl') == 1 then
-    vim.api.nvim_create_autocmd('TextYankPost', {
-        group = vim.api.nvim_create_augroup('Yank', { clear = true }),
-        callback = function()
-            vim.fn.system('clip.exe', vim.fn.getreg('"'))
-        end,
-    })
+if vim.fn.has 'wsl' == 1 then
+  vim.api.nvim_create_autocmd('TextYankPost', {
+    group = vim.api.nvim_create_augroup('Yank', { clear = true }),
+    callback = function()
+      vim.fn.system('clip.exe', vim.fn.getreg '"')
+    end,
+  })
 end
