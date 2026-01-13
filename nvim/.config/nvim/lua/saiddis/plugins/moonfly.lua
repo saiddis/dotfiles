@@ -129,7 +129,6 @@ return {
       SignColumn = { fg = colors.mineral, bg = colors.grey7 },
       Boolean = { fg = colors.green },
       Parameter = { fg = colors.orange },
-      ['@keyword.return'] = { fg = colors.cranberry },
     }
 
     for hl, col in pairs(OverrideColors) do
