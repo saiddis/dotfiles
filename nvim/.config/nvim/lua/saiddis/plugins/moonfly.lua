@@ -47,10 +47,10 @@ return {
 
     colors.purple = '#AE81FF'
     colors.violet = '#E593EE'
-    colors.cranberry = '#F77AB8'
+    colors.cranberry = '#ff5874'
     colors.red = '#ff5874'
     colors.lavender = '#a9b1d6'
-    colors.orchid = colors.cranberry
+    colors.orchid = '#F77AB8'
 
     colors.bg = '#000000'
     colors.white = '#E7EAEE'
@@ -63,7 +63,7 @@ return {
     colors.turquoise = '#7fdbca'
     colors.khaki = '#E6E666'
     colors.yellow = '#FDFD70'
-    colors.orange = '#FFA064'
+    colors.orange = '#FC9949'
     colors.blue = '#AFDBFD'
     colors.sky = '#5CCEFF'
     colors.coral = '#FC9B7D'
@@ -108,7 +108,7 @@ return {
       SnacksPickerBoxBorder = { bg = colors.grey7, fg = colors.grey7 },
       SnacksWinSeparator = { bg = colors.grey7, fg = colors.grey7 },
 
-      SnacksPickerGitStatusModified = { fg = colors.cranberry },
+      SnacksPickerGitStatusModified = { fg = colors.orchid },
       SnacksPickerGitStatusChanged = { fg = colors.orange },
 
       GitSignsAdd = { fg = colors.emerald, bg = colors.black, bold = true },
@@ -127,14 +127,9 @@ return {
       CursorLineSign = { bg = colors.grey15 },
       LineNr = { fg = colors.mineral, bg = colors.grey7 },
       SignColumn = { fg = colors.mineral, bg = colors.grey7 },
-      Keyword = { fg = colors.red },
-      Operator = { fg = colors.cranberry },
       Boolean = { fg = colors.green },
-      Conditional = { fg = colors.violet },
-      ['@keyword.import'] = { fg = colors.red },
-      -- Conditional = { fg = colors.cranberry },
-      -- Directory = { fg = colors.emerald, bold = true },
-      -- String = { fg = colors.yellow },
+      Parameter = { fg = colors.orange },
+      ['@keyword.return'] = { fg = colors.cranberry },
     }
 
     for hl, col in pairs(OverrideColors) do
