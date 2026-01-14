@@ -12,7 +12,7 @@ return {
       enable_semantic_tokens = true,
 
       -- Automatically discover zig executable
-      zig_exe_path = 'zig',
+      zig_exe_path = '/usr/bin/zig',
 
       -- Control build-on-save behavior
       build_on_save = false,
