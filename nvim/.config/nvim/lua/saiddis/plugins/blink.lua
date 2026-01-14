@@ -14,6 +14,7 @@ return {
       'huijiro/blink-cmp-supermaven',
     },
   },
+  version = '1.*',
   opts = {
     appearance = {
 
