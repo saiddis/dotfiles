@@ -7,6 +7,7 @@ return {
 
     configs.setup {
       ensure_installed = {
+        'odin',
         'c',
         'zig',
         'bash',

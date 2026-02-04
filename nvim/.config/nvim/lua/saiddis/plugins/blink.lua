@@ -59,7 +59,7 @@ return {
     },
 
     sources = {
-      default = { 'lsp', 'path', 'supermaven', 'snippets', 'buffer' },
+      default = { 'lsp', 'path', 'snippets', 'buffer' },
       providers = {
         supermaven = {
           name = 'supermaven',
