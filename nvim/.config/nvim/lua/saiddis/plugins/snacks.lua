@@ -7,9 +7,10 @@ return {
     -- your configuration comes here
     -- or leave it empty to use the default settings
     -- refer to the configuration section below
+    animate = { enabled = false },
     bigfile = { enabled = true },
     explorer = { enabled = true, replace_netrw = true },
-    indent = { enabled = true },
+    indent = { enabled = true, only_scope = true, only_current = true, animate = { enabled = false } },
     input = { enabled = true },
     notify = { enabled = false },
     notifier = {
@@ -19,7 +20,7 @@ return {
       height = { min = 1, max = 1000 },
     },
     bufdelete = { enabled = true },
-    dashboard = { enabled = true },
+    dashboard = { enabled = false },
     scope = { enabled = true },
     gh = { enabled = false },
     keymap = { enabled = true },
@@ -89,24 +90,24 @@ return {
           },
         },
         list = {
+          border = true,
           keys = {
             ['_'] = { 'edit_split' },
             ['|'] = { 'edit_vsplit' },
-            ['<c-l>'] = { 'loclist' },
+            -- ['<c-l>'] = { 'loclist' },
             ['<C-w>'] = { { 'pick_win', 'jump' } },
           },
           wo = {
-            statuscolumn = ' ',
+            statuscolumn = '',
             signcolumn = 'no',
-            -- foldcolumn = "no",
           },
         },
         preview = {
-          wo = {
-            statuscolumn = ' ',
-            signcolumn = 'no',
-            -- foldcolumn = "no",
-          },
+          -- wo = {
+          --   statuscolumn = ' ',
+          --   signcolumn = 'no',
+          --   -- foldcolumn = "no",
+          -- },
         },
       },
     },
@@ -121,12 +122,11 @@ return {
         wo = { wrap = true }, -- Wrap notifications
       },
     },
-    -- animate = { enabled = true },
   },
   keys = {
 
     {
-      '<leader>ss',
+      '<leader>sS',
       function()
         Snacks.picker.highlights { pattern = 'hl_group:^Snacks' }
       end,
@@ -316,33 +316,33 @@ return {
       end,
       desc = 'Goto T[y]pe Definition',
     },
-    -- {
-    -- 	"<leader>ss",
-    -- 	function()
-    -- 		Snacks.picker.lsp_symbols({
-    -- 			layout = "left",
-    -- 			filter = {
-    -- 				default = {
-    -- 					"Class",
-    -- 					"Constructor",
-    -- 					"Enum",
-    -- 					-- "Field",
-    -- 					"Function",
-    -- 					"Interface",
-    -- 					"Method",
-    -- 					"Module",
-    -- 					"Namespace",
-    -- 					"Package",
-    -- 					"Property",
-    -- 					"Struct",
-    -- 					"Trait",
-    -- 					"Variable",
-    -- 				},
-    -- 			},
-    -- 		})
-    -- 	end,
-    -- 	desc = "LSP Symbols",
-    -- },
+    {
+      '<leader>ss',
+      function()
+        Snacks.picker.lsp_symbols {
+          layout = 'left',
+          filter = {
+            default = {
+              'Class',
+              'Constructor',
+              'Enum',
+              -- "Field",
+              'Function',
+              'Interface',
+              'Method',
+              'Module',
+              'Namespace',
+              'Package',
+              'Property',
+              'Struct',
+              'Trait',
+              'Variable',
+            },
+          },
+        }
+      end,
+      desc = 'LSP Symbols',
+    },
     {
       '<leader>sw',
       function()
