@@ -1,8 +1,12 @@
-/* @define-color Highlight rgba(0, 102, 255, 1.0); */
-@define-color PanelBackground rgba(0, 0, 0, 0.7);
-/* @define-color ModuleBackground rgba(16, 16, 16, 1.0); */
+@define-color PanelBackground rgba(16, 16, 16, 1.0);
+@define-color Highlight rgba(98, 114, 164, 1.0);
+
+#panel {
+  background-color: @PanelBackground;
+  border-left: 1px solid @Border;
+}
 
 #clock #clockTime {
-	font-size: 1.4rem;
-	font-weight: 400;
+  font-size: 1.4rem;
+  font-weight: 400;
 }
