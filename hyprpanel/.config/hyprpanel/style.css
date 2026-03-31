@@ -1,12 +1,33 @@
-@define-color PanelBackground rgba(16, 16, 16, 1.0);
-@define-color Highlight rgba(98, 114, 164, 1.0);
-
-#panel {
-  background-color: @PanelBackground;
-  border-left: 1px solid @Border;
-}
+@define-color PanelBackground rgba(16, 16, 16, 1);
+@define-color Highlight rgba(85, 136, 255, 0.5);
 
 #clock #clockTime {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 400;
+}
+
+/* #pager .workspace.active { */
+/*   border: alpha(@Highlight, 0.8) 1px solid; */
+/* } */
+
+#idleInhibitor.module,
+#mediaPlayer.module {
+  padding: 14px 8px;
+}
+
+#audio.module {
+  padding: 12px 8px;
+}
+
+#power.module {
+  padding: 10px 8px;
+}
+
+#clock.module,
+#notifications.module {
+  padding: 8px 3px;
+}
+
+#session.module {
+  padding: 12px 8px;
 }

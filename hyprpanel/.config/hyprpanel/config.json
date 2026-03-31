@@ -1,5 +1,5 @@
 {
-  "log_level": "LOG_LEVEL_ERROR",
+  "log_level": "LOG_LEVEL_DEBUG",
   "dbus": {
     "enabled": true,
     "connect_timeout": "20s",
@@ -41,39 +41,62 @@
     "volume_exceed_maximum": false,
     "hud_notifications": false
   },
-  "icon_overrides": [],
+  "icon_overrides": [
+    {
+      "window_class": "missioncenter",
+      "icon": "htop"
+    },
+    {
+      "window_class": "AyuGram Desktop",
+      "icon": "telegram"
+    }
+  ],
   "launch_wrapper": ["sh", "-c"],
   "panels": [
     {
       "id": "panel0",
-      "edge": "EDGE_RIGHT",
+      "edge": "EDGE_LEFT",
       "size": 64,
+      "handle_enabled": false,
+      "handle_reveal_mode": "PANEL_HANDLE_REVEAL_MODE_HOVER",
+      "auto_hide_delay": "1s",
       "monitor": "",
       "modules": [
         {
           "taskbar": {
-            "icon_size": 48,
+            "icon_size": 44,
             "active_workspace_only": false,
-            "active_monitor_only": false,
+            "active_monitor_only": true,
             "group_tasks": true,
-            "hide_indicators": true,
+            "hide_indicators": false,
             "expand": true,
             "max_size": 0,
-            "pinned": [
-              "discord",
-              "google-chrome",
-              "zen",
-              "obsidian",
-              "gimp",
-              "zed"
-            ],
+            "pinned": ["discord", "AyuGram Desktop", "thunderbird", "zen"],
             "preview_width": 256
           }
         },
         {
-          "spacer": {
-            "size": 16,
-            "expand": false
+          "pager": {
+            "icon_size": 15,
+            "active_monitor_only": true,
+            "scroll_wrap_workspaces": true,
+            "scroll_include_inactive": true,
+            "enable_workspace_names": false,
+            "pinned": [1, 2, 3],
+            "ignore_windows": [],
+            "preview_width": 256,
+            "follow_window_on_move": false,
+            "show_hidden": false
+          }
+        },
+        {
+          "notifications": {
+            "icon_size": 28,
+            "notification_icon_size": 48,
+            "default_timeout": "7s",
+            "position": "POSITION_TOP_RIGHT",
+            "margin": 24,
+            "persistent": []
           }
         },
         {
@@ -91,70 +114,30 @@
           }
         },
         {
-          "spacer": {
-            "size": 20,
-            "expand": false
-          }
-        },
-        {
           "idle_inhibitor": {
-            "icon_size": 22,
+            "icon_size": 19,
             "icon_symbolic": true,
             "default_target": 1
           }
         },
         {
-          "spacer": {
-            "size": 24,
-            "expand": false
-          }
-        },
-        {
-          "power": {
-            "icon_size": 25,
+          "media_player": {
+            "icon_size": 19,
             "icon_symbolic": true
-          }
-        },
-        {
-          "notifications": {
-            "icon_size": 28,
-            "notification_icon_size": 48,
-            "default_timeout": "7s",
-            "position": "POSITION_TOP_RIGHT",
-            "margin": 24,
-            "persistent": []
-          }
-        },
-        {
-          "spacer": {
-            "size": 20,
-            "expand": false
           }
         },
         {
           "audio": {
-            "icon_size": 28,
+            "icon_size": 25,
             "icon_symbolic": true,
             "command_mixer": "pavucontrol",
-            "enable_source": true
+            "enable_source": false
           }
         },
         {
-          "spacer": {
-            "size": 18,
-            "expand": false
-          }
-        },
-        {
-          "media_player": {
-            "icon_size": 20,
+          "power": {
+            "icon_size": 24,
             "icon_symbolic": true
-          }
-        },
-        {
-          "spacer": {
-            "size": 18,
-            "expand": false
           }
         },
         {
@@ -168,7 +151,7 @@
         },
         {
           "session": {
-            "icon_size": 24,
+            "icon_size": 25,
             "icon_symbolic": true,
             "overlay_icon_size": 96,
             "overlay_icon_symbolic": true,
@@ -176,12 +159,6 @@
             "command_reboot": "reboot",
             "command_suspend": "suspend",
             "command_shutdown": "poweroff"
-          }
-        },
-        {
-          "spacer": {
-            "size": 16,
-            "expand": false
           }
         }
       ]
