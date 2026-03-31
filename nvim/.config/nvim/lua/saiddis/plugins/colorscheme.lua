@@ -27,12 +27,12 @@ return {
     colors.white = '#D7D7D7'
     colors.green = '#B1E268'
     colors.lime = '#25FF5F'
-    colors.emerald = '#5ADA7C'
+    colors.emerald = '#38dc90'
     colors.turquoise = '#7fdbca'
     colors.khaki = '#E3CF65'
     colors.yellow = '#E6E666'
     colors.orange = '#FC9949'
-    colors.blue = '#8DBBD3'
+    colors.blue = '#5588FF'
     colors.sky = '#5CCEFF'
     colors.purple = '#AE81FF'
     colors.violet = '#E593EE'
@@ -71,6 +71,9 @@ return {
       CursorLine = { bg = colors.grey7, bold = false },
       CursorLineSign = { bg = colors.grey15 },
       SignColumn = { fg = colors.mineral, bg = colors.grey7 },
+
+      -- Keyword = { fg = colors.violet, italic = true },
+      String = { fg = colors.khaki, italic = true },
     }
 
     for hl, col in pairs(OverrideColors) do

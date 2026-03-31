@@ -111,7 +111,7 @@ return {
         },
       },
     },
-    lazygit = { enabled = false },
+    lazygit = { enabled = true },
     quickfile = { enabled = true },
     scroll = { enabled = false },
     layout = { enabled = true },
@@ -156,6 +156,36 @@ return {
       function()
         Snacks.picker.files {
           layout = 'vscode',
+          exclude = {
+            '.git',
+            '.svn',
+            '.hg',
+
+            'node_modules',
+            'vendor',
+            'dist',
+            'build',
+            'target',
+            'coverage',
+
+            '__pycache__',
+            '.mypy_cache',
+            '.pytest_cache',
+
+            '.DS_Store',
+            'Thumbs.db',
+
+            '.idea',
+            '.vscode',
+
+            '*.log',
+            '*.tmp',
+            '*.swp',
+            '*.lock',
+
+            '*.min.js',
+            '*.min.css',
+          },
         }
       end,
       desc = 'Find Files',

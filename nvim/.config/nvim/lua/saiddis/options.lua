@@ -118,13 +118,11 @@ vim.lsp.enable {
   'clangd',
   'zls',
   'buf_ls',
-  'deno',
   'gopls',
   'lua_ls',
-  'rust_analyzer',
   'tailwindcss',
   'ts_ls',
-  'prismals',
+  'svelte-language-server',
 }
 
 vim.opt.laststatus = 0 -- Or 3 for global statusline
