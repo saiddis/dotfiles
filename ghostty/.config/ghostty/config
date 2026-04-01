@@ -1,34 +1,24 @@
-theme = Moonfly
+theme = Paul Millr
 
-foreground = #d6deeb
-background = #000000
-selection-background = #FFFF4A
-selection-foreground = #000000
+font-family = CodeNewRoman Nerd Font Mono
 
-palette = 2=#25FF5F
-palette = 10=#E593EE
-
-font-family = M+1Code Nerd Font
-
-font-size = 12.0
+font-size = 14.0
 gtk-titlebar = false
 cursor-color = #25FF5F
 mouse-hide-while-typing = true
-gtk-tabs-location = hidden
-window-decoration = false
+# gtk-tabs-location = hidden
+window-decoration = true
 
 keybind = alt=toggle_secure_input
 keybind = ctrl+t=new_tab
-keybind = alt+p=previous_tab
-keybind = alt+n=next_tab
+#keybind = alt+p=previous_tab
+#keybind = alt+n=next_tab
 
 keybind = ctrl+shift+n=unbind
 keybind = super+ctrl+bracket_right=unbind
 keybind = ctrl+tab=unbind
 keybind = ctrl+shift+tab=unbind
 
-keybind = ctrl+tab=goto_split:next
-keybind = ctrl+shift+tab=goto_split:previous
 keybind = alt+w=new_split:auto
 keybind = ctrl+shift+h=goto_split:left
 keybind = ctrl+shift+j=goto_split:bottom
