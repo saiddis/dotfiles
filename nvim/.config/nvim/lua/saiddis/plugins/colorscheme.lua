@@ -62,18 +62,19 @@ return {
       SnacksPickerGitStatusModified = { fg = colors.orange },
       SnacksPickerGitStatusChanged = { fg = colors.yellow },
       SnacksPickerTree = { fg = colors.grey15, bold = false },
-      SnacksIndentScope = { fg = colors.grey15 },
+      -- SnacksIndentScope = { fg = colors.grey15 },
 
       FloatBorder = { bg = colors.grey7, fg = colors.grey7 },
       FloatTitle = { fg = colors.emerald, bg = colors.mineral },
       NormalFloat = { bg = colors.grey7 },
       CursorLineNr = { bg = colors.bg, fg = colors.emerald, bold = true },
-      CursorLine = { bg = colors.grey7, bold = false },
+      CursorLine = { bg = colors.grey15, bold = false },
       CursorLineSign = { bg = colors.grey15 },
-      SignColumn = { fg = colors.mineral, bg = colors.grey7 },
+      SignColumn = { fg = colors.mineral, bg = colors.grey15 },
+      ColorColumn = { bg = colors.grey7 },
 
       -- Keyword = { fg = colors.violet, italic = true },
-      String = { fg = colors.khaki, italic = true },
+      -- String = { fg = colors.khaki, italic = true },
     }
 
     for hl, col in pairs(OverrideColors) do

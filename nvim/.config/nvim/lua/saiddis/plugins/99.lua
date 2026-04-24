@@ -94,8 +94,8 @@ return {
       _99.stop_all_requests()
     end)
 
-    vim.keymap.set('n', '<leader>s', function()
-      _99.search()
-    end)
+    -- vim.keymap.set('n', '<leader>s', function()
+    --   _99.search()
+    -- end)
   end,
 }
