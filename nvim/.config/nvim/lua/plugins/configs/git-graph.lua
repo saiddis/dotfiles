@@ -1,0 +1,39 @@
+local M = {
+	"isakbm/gitgraph.nvim",
+	-- dependencies = { "sindrets/diffview.nvim" },
+	enabled = false,
+}
+
+function M.init()
+	require("mappings").register({
+		"<leader>gg",
+		function()
+			require("gitgraph").draw({}, { all = true, max_count = 5000 })
+		end,
+		desc = "Graph",
+	})
+end
+
+function M.config()
+	require("gitgraph").setup({
+		format = {
+			timestamp = "%H:%M:%S %d-%m-%Y",
+			fields = { "hash", "timestamp", "author", "branch_name", "tag" },
+		},
+
+		-- Integration with diffview.nvim
+		-- hooks = {
+		-- 	-- Check diff of a commit
+		-- 	on_select_commit = function(commit)
+		-- 		vim.cmd(":DiffviewOpen " .. commit.hash .. "^!")
+		-- 	end,
+		--
+		-- 	-- Check diff from commit a -> commit b
+		-- 	on_select_range_commit = function(from, to)
+		-- 		vim.cmd(":DiffviewOpen " .. from.hash .. "~1.." .. to.hash)
+		-- 	end,
+		-- },
+	})
+end
+
+return M

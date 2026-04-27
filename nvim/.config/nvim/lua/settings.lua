@@ -1,0 +1,129 @@
+local M = {}
+
+function M.setup()
+	local cmd = vim.cmd
+	local opt = vim.opt
+	local keymap = vim.keymap
+	local icons = require("icons")
+	local TERMINAL = vim.fn.expand("$TERMINAL")
+	local CACHE_PATH = vim.fn.stdpath("cache")
+
+	keymap.set("n", "<C-d>", "<C-d>zz")
+	keymap.set("n", "<C-u>", "<C-u>zz")
+	keymap.set("n", "n", "nzzzv")
+	keymap.set("n", "N", "Nzzzv")
+	keymap.set("n", "<leader>p", '"_dP')
+
+	---  VIM ONLY COMMANDS  ---
+
+	cmd("filetype plugin on") -- filetype detection
+	cmd('let &titleold="' .. TERMINAL .. '"')
+	cmd("set inccommand=split") -- show what you are substituting in real time
+	cmd("set iskeyword+=-") -- treat dash as a separate word
+
+	cmd("set wrap linebreak") -- wrap on words
+	cmd("let &showbreak = '" .. icons.arrow.right_down_curved .. " '") -- change the wrapping symbol
+	cmd("set whichwrap+=<,>,[,],h,l") -- move to next line with theses keys
+
+	-- Automatically equalize splits when Vim is resized
+	cmd("autocmd VimResized * wincmd =")
+
+	-- PYTHON PATH --
+
+	vim.g.python3_host_prog = "~/envs/nvim/bin/python"
+
+	---  SETTINGS  ---
+
+	opt.confirm = true -- asks for confirmation instead of giving errors (e.g., on quitting without saving)
+	opt.backup = false -- creates a backup file
+	opt.clipboard = "unnamedplus" -- allows neovim to access the system clipboard
+	opt.cmdheight = 2 -- space in the neovim command line for displaying messages
+	opt.completeopt = { "menuone", "noselect" }
+	opt.conceallevel = 2 -- so that `` is visible in markdown files
+	opt.fileencoding = "utf-8" -- the encoding written to a file
+	opt.hidden = true -- required to keep multiple buffers and open multiple buffers
+	opt.hlsearch = false -- highlight all matches on previous search pattern
+	opt.ignorecase = true -- ignore case in search patterns
+	opt.mouse = "a" -- allow the mouse to be used in neovim
+	opt.mousemoveevent = true -- allows mouse hovers to be detected
+	opt.pumheight = 10 -- pop up menu height
+	opt.showmode = false -- we don't need to see things like -- INSERT -- anymore
+	opt.showtabline = 0 -- always show tabs
+	opt.smartcase = true -- smart case
+	opt.smartindent = true -- makes indenting smarter
+	opt.autoindent = true -- makes indenting automatic
+	opt.splitbelow = true -- force all horizontal splits to go below current window
+	opt.splitright = true -- force all vertical splits to go to the right of current window
+	opt.swapfile = false -- creates a swapfile
+	opt.termguicolors = true -- set term gui colors (most terminals support this)
+	opt.timeoutlen = 100 -- time to wait for a mapped sequence to complete (in milliseconds)
+	opt.title = true -- set the title of window to the value of the titlestring
+	opt.titlestring = "%<%F  %l:%L" -- what the title of the window will be set to
+	opt.undodir = CACHE_PATH .. "/undo" -- set an undo directory
+	opt.undofile = true -- enable persisten undo
+	opt.updatetime = 300 -- faster completion
+	opt.writebackup = false -- if a file is being edited by another program (or was written to file while editing with another program), it is not allowed to be edited
+	opt.expandtab = true -- convert tabs to spaces
+	opt.shiftwidth = 4 -- the number of spaces inserted for each indentation
+	opt.shortmess:append("c") -- don't pass messages to |ins-completion-menu|
+	opt.tabstop = 4 -- insert 4 spaces for a tab
+	opt.cursorline = true -- highlight the current line
+	opt.number = true -- set numbered lines
+	opt.relativenumber = true -- set relative numbered lines
+	opt.signcolumn = "yes" -- always show the sign column, otherwise it would shift the text each time
+	opt.wrap = true -- display lines as one long line
+	opt.laststatus = 3 -- display one statusline for all windows
+	opt.guicursor = "i:ver100-blinkoff700-blinkon700"
+	opt.splitkeep = "screen"
+	opt.pumblend = 10 -- popups transparency
+	opt.pumheight = 10 -- maximum number of entries in a popup
+	opt.winblend = 10 -- floating windows transparency
+	opt.winborder = "none" -- default window border style
+	opt.termsync = false -- don't sync neovim with terminal emulator
+	-- opt.colorcolumn = "80"
+	-- opt.sessionoptions =
+	-- { "buffers", "curdir", "tabpages", "winsize", "winpos", "globals", "localoptions", "folds", "terminal", "help" }
+	opt.sessionoptions = "globals,blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+
+	-- Folding & fillchars
+	vim.o.fillchars = "eob: ,lastline: ,fold: ,foldopen:"
+		.. icons.arrow.down_short_thick
+		.. ",foldsep: ,foldclose:"
+		.. icons.arrow.right_short_thick
+		.. ",trunc:"
+		.. icons.three_dots
+		.. ",truncrl:"
+		.. icons.three_dots
+	vim.o.foldcolumn = "1"
+	vim.o.foldlevel = 99
+	vim.o.foldlevelstart = 99
+	vim.o.foldenable = true
+
+	-- -- Disable folds in the following filetypes
+	vim.api.nvim_create_autocmd("FileType", {
+		pattern = { "NeogitStatus" },
+		callback = function()
+			local present, ufo = pcall(require, "ufo")
+			if present then
+				ufo.detach()
+			end
+			vim.opt_local.foldenable = false
+			vim.wo.foldcolumn = "0"
+		end,
+	})
+
+	-- Automatically fold imports
+	vim.api.nvim_create_autocmd("LspNotify", {
+		callback = function(args)
+			if args.data.method == "textDocument/didOpen" then
+				vim.lsp.foldclose("imports", vim.fn.bufwinid(args.buf))
+			end
+		end,
+	})
+
+	-- Make TreeSitter highlight groups have higher priority than LSP semantic tokens
+	vim.highlight.priorities.treesitter = 100
+	vim.highlight.priorities.semantic_tokens = 95
+end
+
+return M
