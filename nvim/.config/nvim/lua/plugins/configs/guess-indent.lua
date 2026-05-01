@@ -1,5 +1,6 @@
 local M = {
 	"nmac427/guess-indent.nvim",
+	lazy = false,
 	-- Required by hlchunk and any other plugins that uses it
 }
 

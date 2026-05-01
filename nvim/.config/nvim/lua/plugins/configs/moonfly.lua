@@ -41,6 +41,7 @@ local function apply_override_colors(colors)
 		SignColumn = { bg = ui.bg_primary },
 		FoldColumn = { bg = ui.bg_primary, fg = ui.fg_secondary },
 		CursorLineFold = { bg = ui.selected },
+		ColorColumn = { bg = ui.bg_secondary },
 	}
 
 	for highlight, value in pairs(override_colors) do
@@ -88,7 +89,7 @@ function M.config()
 	colors.purple = "#AE81FF"
 	colors.violet = "#E593EE"
 	colors.lavender = "#a9b1d6"
-	-- colors.orchid = "#ff79c6"
+	-- colors.orchid = "#FC9949"
 
 	require("moonfly").custom_colors(colors)
 

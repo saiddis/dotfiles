@@ -1,5 +1,6 @@
 local M = {
 	"theHamsta/nvim-dap-virtual-text",
+	enabled = false,
 	cond = not vim.g.started_by_firenvim and not vim.g.vscode,
 }
 

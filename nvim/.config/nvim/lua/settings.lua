@@ -75,12 +75,12 @@ function M.setup()
 	opt.laststatus = 3 -- display one statusline for all windows
 	opt.guicursor = "i:ver100-blinkoff700-blinkon700"
 	opt.splitkeep = "screen"
-	opt.pumblend = 10 -- popups transparency
-	opt.pumheight = 10 -- maximum number of entries in a popup
-	opt.winblend = 10 -- floating windows transparency
+	-- opt.pumblend = 10 -- popups transparency
+	-- opt.pumheight = 10 -- maximum number of entries in a popup
+	-- opt.winblend = 10 -- floating windows transparency
 	opt.winborder = "none" -- default window border style
 	opt.termsync = false -- don't sync neovim with terminal emulator
-	-- opt.colorcolumn = "80"
+	-- opt.colorcolumn = "100"
 	-- opt.sessionoptions =
 	-- { "buffers", "curdir", "tabpages", "winsize", "winpos", "globals", "localoptions", "folds", "terminal", "help" }
 	opt.sessionoptions = "globals,blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"

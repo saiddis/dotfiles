@@ -139,6 +139,7 @@ local M = {
 		bigfile = { enabled = true },
 		-- image = { enabled = true }, -- NOTE: works like shit for now
 		--
+		gh = {},
 		explorer = { enabled = true, replace_netrw = true },
 		notify = { enabled = false },
 		notifier = {
@@ -396,6 +397,39 @@ function M.init()
 			"<leader>f",
 			function()
 				fff_picker.picker()
+				-- snacks.picker.files({
+				-- 	layout = "vscode",
+				-- 	exc ude = {
+				-- 		".git",
+				-- 		".svn",
+				-- 		".hg",
+				--
+				-- 		"node_modules",
+				-- 		"vendor",
+				-- 		"dist",
+				-- 		"build",
+				-- 		"target",
+				-- 		"coverage",
+				--
+				-- 		"__pycache__",
+				-- 		".mypy_cache",
+				-- 		".pytest_cache",
+				--
+				-- 		".DS_Store",
+				-- 		"Thumbs.db",
+				--
+				-- 		".idea",
+				-- 		".vscode",
+				--
+				-- 		"*.log",
+				-- 		"*.tmp",
+				-- 		"*.swp",
+				-- 		"*.lock",
+				--
+				-- 		"*.min.js",
+				-- 		"*.min.css",
+				-- 	},
+				-- })
 			end,
 			desc = "Find files",
 		},
@@ -429,7 +463,27 @@ function M.init()
 		{
 			"<leader>cs",
 			function()
-				snacks.picker.lsp_symbols()
+				snacks.picker.lsp_symbols({
+					layout = "left",
+					filter = {
+						default = {
+							"Class",
+							"Constructor",
+							"Enum",
+							-- "Field",
+							"Function",
+							"Interface",
+							"Method",
+							"Module",
+							"Namespace",
+							"Package",
+							"Property",
+							"Struct",
+							"Trait",
+							"Variable",
+						},
+					},
+				})
 			end,
 			desc = "Symbols",
 		},
@@ -470,8 +524,109 @@ function M.init()
 			end,
 			desc = "LSP servers",
 		},
+		{
+			"<leader>co",
+			function()
+				snacks.picker.colorschemes()
+			end,
+			desc = "Colorschemes",
+		},
+		{
+			"<leader>q",
+			function()
+				snacks.picker.qflist()
+			end,
+			desc = "Quickfix List",
+		},
+		{
+			"<leader>P",
+			function()
+				snacks.picker.projects()
+			end,
+			desc = "Projects",
+		},
+		{
+			"<leader>d",
+			function()
+				snacks.picker.diagnostics({
+					layout = "bottom",
+					matcher = {
+						fuzzy = true,
+						ignorecase = false,
+						smartcase = true,
+					},
+				})
+			end,
+			desc = "Diagnostics",
+		},
+		{
+			"<leader>D",
+			function()
+				snacks.picker.diagnostics_buffer()
+			end,
+			desc = "Buffer Diagnostics",
+		},
+		{
+			"<leader>h",
+			function()
+				snacks.picker.help()
+			end,
+			desc = "Help Pages",
+		},
+
+		-- Lsp
+		{
+			"<leader>ca",
+			function()
+				vim.lsp.buf.code_action()
+			end,
+			desc = "Code actions",
+		},
+		{
+			"gd",
+			function()
+				snacks.picker.lsp_definitions()
+			end,
+			desc = "Goto Definition",
+		},
+		{
+			"gD",
+			function()
+				snacks.picker.lsp_declarations()
+			end,
+			desc = "Goto Declaration",
+		},
+		{
+			"gr",
+			function()
+				snacks.picker.lsp_references()
+			end,
+			nowait = true,
+			desc = "References",
+		},
+		{
+			"gi",
+			function()
+				snacks.picker.lsp_implementations()
+			end,
+			desc = "Goto Implementation",
+		},
+		{
+			"gy",
+			function()
+				snacks.picker.lsp_type_definitions()
+			end,
+			desc = "Goto T[y]pe Definition",
+		},
 
 		-- Git
+		{
+			"<leader>gg",
+			function()
+				snacks.lazygit()
+			end,
+			desc = "Lazygit",
+		},
 		{
 			"<leader>gb",
 			function()
@@ -518,6 +673,26 @@ function M.init()
 				snacks.picker.gh_pr({ state = "all" })
 			end,
 			desc = "All",
+		},
+
+		-- Other
+		{
+			"<leader>N",
+			desc = "Neovim News",
+			function()
+				snacks.win({
+					file = vim.api.nvim_get_runtime_file("doc/news.txt", false)[1],
+					width = 0.6,
+					height = 0.6,
+					wo = {
+						spell = false,
+						wrap = false,
+						signcolumn = "yes",
+						statuscolumn = " ",
+						conceallevel = 3,
+					},
+				})
+			end,
 		},
 	})
 end

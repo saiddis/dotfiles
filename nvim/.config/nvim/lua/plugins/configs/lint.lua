@@ -68,7 +68,7 @@ function M.config()
 
 		php = { "trivy" },
 
-		go = { "golangcilint", "snyk_iac", "trivy" },
+		-- go = { "golangcilint", "snyk_iac", "trivy" },
 
 		javascript = { "eslint_d", "snyk_iac", "trivy" },
 		typescript = { "eslint_d", "snyk_iac", "trivy" },
@@ -88,7 +88,7 @@ function M.config()
 
 		-- yaml = { "yamllint" }, -- too much noise
 
-		sql = { "postgres-language-server" },
+		sql = { "sqlfluff" },
 	}
 end
 

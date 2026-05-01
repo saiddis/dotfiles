@@ -61,10 +61,10 @@ function M.config()
 			"rust-analyzer",
 
 			-- Go
-			"gopls",
-			"golangci-lint",
-			"goimports",
-			"delve",
+			-- "gopls",
+			-- "golangci-lint",
+			-- "goimports",
+			-- "delve",
 
 			-- Lua
 			"lua-language-server",

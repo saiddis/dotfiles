@@ -1,5 +1,6 @@
 local M = {
 	"leoluz/nvim-dap-go",
+	enabled = false,
 	cond = not vim.g.started_by_firenvim and not vim.g.vscode,
 }
 

@@ -17,6 +17,7 @@ local M = {
 		"DapContinue",
 		"DapTest",
 	},
+	enabled = false,
 	cond = not vim.g.started_by_firenvim and not vim.g.vscode,
 }
 
@@ -104,7 +105,6 @@ function M.config()
 		},
 		name = "lldb",
 	}
-
 end
 
 return M

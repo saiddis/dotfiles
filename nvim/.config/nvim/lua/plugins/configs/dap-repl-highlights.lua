@@ -1,5 +1,6 @@
 local M = {
 	"LiadOz/nvim-dap-repl-highlights",
+	enabled = false,
 	cond = not vim.g.started_by_firenvim and not vim.g.vscode,
 }
 

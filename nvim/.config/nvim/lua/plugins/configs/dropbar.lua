@@ -2,7 +2,7 @@ local M = {
 	"Bekaboo/dropbar.nvim",
 	lazy = false,
 	cond = not vim.g.started_by_firenvim,
-	enabled = false,
+	-- enabled = false,
 }
 
 function M.init()

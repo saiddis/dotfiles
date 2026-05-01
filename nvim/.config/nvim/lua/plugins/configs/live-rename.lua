@@ -4,7 +4,7 @@ local M = {
 
 function M.init()
 	require("mappings").register({
-		"<leader>cr",
+		"<leader>rn",
 		function()
 			require("live-rename").rename()
 			vim.cmd("wa") -- save all buffers

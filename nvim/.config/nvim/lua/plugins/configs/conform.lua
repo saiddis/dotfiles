@@ -52,7 +52,7 @@ function M.config()
 			cpp = { "clang_format" },
 
 			-- Golang
-			go = { "gofmt" },
+			-- go = { "gofmt" },
 
 			-- Javascript/Typescript
 			javascript = { "prettierd" },
@@ -90,7 +90,7 @@ function M.config()
 			cmake = { "cmake_format" },
 
 			-- SQL
-			sql = { "pgformatter" },
+			sql = { "sleek" },
 
 			-- Injected
 			["*"] = { "injected" },

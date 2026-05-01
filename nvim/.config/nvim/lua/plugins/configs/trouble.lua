@@ -1,7 +1,7 @@
 local M = {
 	"folke/trouble.nvim",
 	cmd = "Trouble",
-	-- enabled = false,
+	enabled = false,
 }
 
 function M.init()

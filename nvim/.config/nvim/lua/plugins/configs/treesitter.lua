@@ -54,11 +54,12 @@ function M.config()
 			-- vim.wo.foldmethod = "expr"
 			-- vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 
+			vim.treesitter.query.set(language, "injections", "")
 			-- Highlighting
 			vim.treesitter.start(buf, language)
 
 			-- Indentation
-			vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+			-- vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
 		end,
 	})
 end
