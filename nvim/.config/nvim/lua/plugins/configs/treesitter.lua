@@ -57,9 +57,6 @@ function M.config()
 			vim.treesitter.query.set(language, "injections", "")
 			-- Highlighting
 			vim.treesitter.start(buf, language)
-
-			-- Indentation
-			-- vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
 		end,
 	})
 end

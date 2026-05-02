@@ -460,25 +460,25 @@ function M.config()
 				-- 	icon = "", -- f013
 				-- 	ignore_lsp = { "copilot" },
 				-- },
-				{
-					"copilot",
-					show_colors = true,
-					show_loading = true,
-					symbols = {
-						status = {
-							icons = {
-								enabled = icons.copilot.enabled,
-								sleep = icons.copilot.sleep,
-								disabled = icons.copilot.disabled,
-								warning = icons.copilot.warning,
-								unknown = icons.copilot.unknown,
-							},
-						},
-					},
-					cond = function()
-						return vim.g.copilot_loaded ~= nil and vim.g.copilot_loaded and vim.g.copilot_loaded ~= false
-					end,
-				},
+				-- {
+				-- 	"copilot",
+				-- 	show_colors = true,
+				-- 	show_loading = true,
+				-- 	symbols = {
+				-- 		status = {
+				-- 			icons = {
+				-- 				enabled = icons.copilot.enabled,
+				-- 				sleep = icons.copilot.sleep,
+				-- 				disabled = icons.copilot.disabled,
+				-- 				warning = icons.copilot.warning,
+				-- 				unknown = icons.copilot.unknown,
+				-- 			},
+				-- 		},
+				-- 	},
+				-- 	cond = function()
+				-- 		return vim.g.copilot_loaded ~= nil and vim.g.copilot_loaded and vim.g.copilot_loaded ~= false
+				-- 	end,
+				-- },
 				{
 					supermaven_provider,
 					cond = function()

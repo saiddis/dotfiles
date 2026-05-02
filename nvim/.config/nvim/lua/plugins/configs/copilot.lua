@@ -6,7 +6,7 @@ local M = {
 	-- },
 	event = "VeryLazy",
 	-- event = "InsertEnter",
-	-- enabled = false,
+	enabled = false,
 }
 
 vim.g.copilot_loaded = false
