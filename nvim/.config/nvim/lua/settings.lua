@@ -5,14 +5,14 @@ function M.setup()
 	local opt = vim.opt
 	local keymap = vim.keymap
 	local icons = require("icons")
-	local TERMINAL = vim.fn.expand("$TERMINAL")
+	local TERMINAL = vim.fn.expand("ghostty")
 	local CACHE_PATH = vim.fn.stdpath("cache")
 
 	keymap.set("n", "<C-d>", "<C-d>zz")
 	keymap.set("n", "<C-u>", "<C-u>zz")
 	keymap.set("n", "n", "nzzzv")
 	keymap.set("n", "N", "Nzzzv")
-	keymap.set("n", "<leader>p", '"_dP')
+	-- keymap.set("n", "<leader>p", '"_dP')
 
 	---  VIM ONLY COMMANDS  ---
 
