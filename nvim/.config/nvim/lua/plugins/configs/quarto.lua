@@ -7,6 +7,7 @@ local M = {
 		"Vigemus/iron.nvim",
 		"benlubas/molten-nvim",
 	},
+	enabled = false,
 	ft = { "markdown", "quarto", "rmd" },
 }
 

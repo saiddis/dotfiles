@@ -1,5 +1,6 @@
 local M = {
 	"Vigemus/iron.nvim",
+	enabled = false,
 }
 
 function M.config()

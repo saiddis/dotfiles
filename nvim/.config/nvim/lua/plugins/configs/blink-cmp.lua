@@ -11,7 +11,7 @@ local M = {
 		"jmbuhr/cmp-pandoc-references",
 	},
 	-- use a release tag to download pre-built binaries
-	version = "v0.*",
+	version = "v1.*",
 	-- OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
 	build = vim.g.blink_enabled and "RUSTUP_TOOLCHAIN=nightly cargo build --release",
 	event = "InsertEnter",
@@ -21,37 +21,6 @@ function M.config()
 	require("blink-cmp").setup({
 		-- for keymap, all values may be string | string[]
 		-- use an empty table to disable a keymap
-		keymap = {
-			["<C-space>"] = { "show", "fallback" },
-			["<C-e>"] = { "hide", "fallback" },
-			["<CR>"] = { "accept", "fallback" },
-			["<Tab>"] = {
-				function(cmp)
-					if cmp.snippet_active() then
-						return cmp.accept()
-					else
-						return cmp.select_next()
-					end
-				end,
-				"snippet_forward",
-				"fallback",
-			},
-			["<S-Tab>"] = {
-				function(cmp)
-					if cmp.snippet_active() then
-						return cmp.accept()
-					else
-						return cmp.select_prev()
-					end
-				end,
-				"snippet_backward",
-				"fallback",
-			},
-			["<C-d>"] = { "show_documentation", "fallback" },
-			["<C-D>"] = { "hide_documentation", "fallback" },
-			["<C-b>"] = { "scroll_documentation_up", "fallback" },
-			["<C-f>"] = { "scroll_documentation_down", "fallback" },
-		},
 
 		appearance = {
 			-- sets the fallback highlight groups to nvim-cmp's highlight groups
@@ -72,6 +41,9 @@ function M.config()
 		},
 
 		completion = {
+			keyword = {
+				range = "full", -- helps completion inside strings
+			},
 			ghost_text = { enabled = false },
 			list = {
 				-- Controls how the completion items are selected
@@ -79,7 +51,7 @@ function M.config()
 				-- 'manual' will not select any item by default
 				-- 'auto_insert' will not select any item by default, and insert the completion items automatically when selecting them
 				selection = {
-					preselect = false,
+					preselect = true,
 					auto_insert = true,
 				},
 			},
@@ -91,7 +63,7 @@ function M.config()
 			menu = {
 				-- we want to prioritize placing the menu above
 				-- so that the Copilot completions are visible
-				direction_priority = { "n", "s" },
+				-- direction_priority = { "n", "s" },
 				draw = {
 					-- We don't need label_description now because label and label_description are already
 					-- conbined together in label by colorful-menu.nvim.
@@ -111,19 +83,25 @@ function M.config()
 		},
 
 		sources = {
+			default = { "lsp", "path", "buffer" },
 			per_filetype = {
 				avante = { "avante", "thesaurus" },
 				octo = { "git" },
 				gitcommit = { "git" },
 				bash = { "env" },
 				zsh = { "env" },
-				markdown = { "lsp", "pandoc_references", "thesaurus", "snippets" },
-				quarto = { "lsp", "pandoc_references", "thesaurus", "snippets" },
+				markdown = { "lsp", "pandoc_references", "snippets" },
+				quarto = { "lsp", "pandoc_references", "snippets" },
 				-- BUG: inherit_defaults is not working fine
 				-- quarto = { inherit_defaults = true, "lsp", "pandoc_references", "thesaurus" },
 				text = { "thesaurus" },
 			},
 			providers = {
+				jupynium = {
+					name = "Jupynium",
+					module = "jupynium.blink_cmp",
+					score_offset = 100,
+				},
 				avante = {
 					module = "blink-cmp-avante",
 					name = "Avante",
@@ -157,7 +135,8 @@ function M.config()
 				},
 				lsp = {
 					async = true,
-					max_items = 7,
+					score_offset = 10,
+					max_items = 10,
 				},
 				snippets = {
 					max_items = 5,

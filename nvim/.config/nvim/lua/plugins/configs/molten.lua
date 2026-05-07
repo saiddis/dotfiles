@@ -5,6 +5,7 @@ local M = {
 		-- "willothy/wezterm.nvim",
 	},
 	build = ":UpdateRemotePlugins",
+	enabled = false,
 	cond = not vim.g.started_by_firenvim and not vim.g.vscode,
 }
 

@@ -137,7 +137,7 @@ local M = {
 	lazy = false,
 	opts = {
 		bigfile = { enabled = true },
-		-- image = { enabled = true }, -- NOTE: works like shit for now
+		image = { enabled = true }, -- NOTE: works like shit for now
 		--
 		gh = {},
 		explorer = { enabled = true, replace_netrw = true },
@@ -434,7 +434,7 @@ function M.init()
 			desc = "Find files",
 		},
 		{
-			"<leader>e",
+			"<C-e>",
 			function()
 				snacks.picker.explorer()
 			end,
