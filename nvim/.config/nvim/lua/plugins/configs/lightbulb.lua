@@ -1,6 +1,7 @@
 local M = {
 	"kosayoda/nvim-lightbulb",
 	event = "VeryLazy",
+	enabled = false,
 }
 
 function M.config()

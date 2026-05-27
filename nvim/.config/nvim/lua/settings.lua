@@ -1,5 +1,96 @@
 local M = {}
 
+local function lsp_on_attach(_, bufnr)
+	local ver = vim.version()
+
+	if ver.major > 0 or ver.minor >= 12 then
+		vim.lsp.on_type_formatting.enable(true)
+
+		-- NOTE: handled by `copilot.lua` plugin
+		vim.lsp.inline_completion.enable(false)
+	end
+
+	vim.lsp.semantic_tokens.enable(true)
+
+	-- Enable completion triggered by <c-x><c-o>
+	vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+end
+
+local function setup_lsp()
+	local ver = vim.version()
+	local capabilities = vim.lsp.protocol.make_client_capabilities()
+
+	local has_blink, blink = pcall(require, "blink.cmp")
+	if has_blink then
+		capabilities = blink.get_lsp_capabilities(capabilities)
+	end
+
+	capabilities.workspace.didChangeWatchedFiles.dynamicRegistration = true
+	capabilities.textDocument.completion.completionItem.documentationFormat = { "markdown", "plaintext" }
+	capabilities.textDocument.completion.completionItem.snippetSupport = true
+	capabilities.textDocument.completion.completionItem.preselectSupport = true
+	capabilities.textDocument.completion.completionItem.insertReplaceSupport = true
+	capabilities.textDocument.completion.completionItem.labelDetailsSupport = true
+	capabilities.textDocument.completion.completionItem.deprecatedSupport = true
+	capabilities.textDocument.completion.completionItem.commitCharactersSupport = true
+	capabilities.textDocument.completion.completionItem.tagSupport.valueSet = { 1 }
+	capabilities.textDocument.completion.completionItem.resolveSupport.properties = {
+		"documentation",
+		"detail",
+		"additionalTextEdits",
+	}
+	capabilities.textDocument.foldingRange = {
+		dynamicRegistration = false,
+		lineFoldingOnly = true,
+	}
+	if ver.major > 0 or ver.minor >= 12 then
+		capabilities.textDocument.onTypeFormatting.dynamicRegistration = false
+	end
+
+	vim.lsp.config("*", {
+		on_attach = lsp_on_attach,
+		capabilities = capabilities,
+		flags = {
+			debounce_text_changes = 150,
+		},
+	})
+
+	vim.lsp.enable({
+		-- "basedpyright",
+		"clangd",
+		"cssls",
+		"denols",
+		"elixirls",
+		"eslint",
+		"gopls",
+		"harper_ls",
+		"html",
+		"htmx",
+		"lua_ls",
+		"nextls",
+		"ols",
+		"postgres_lsp",
+		"prismals",
+		"ruff",
+		"rust_analyzer",
+		"snyk_ls",
+		"svelte",
+		"tailwindcss",
+		"templ",
+		"ts_ls",
+		"ty",
+		"zls",
+		"dartls",
+		"sourcekit",
+	})
+
+	vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
+		callback = function()
+			vim.lsp.codelens.enable(true, { bufnr = 0 })
+		end,
+	})
+end
+
 function M.setup()
 	local cmd = vim.cmd
 	local opt = vim.opt
@@ -124,6 +215,8 @@ function M.setup()
 	-- Make TreeSitter highlight groups have higher priority than LSP semantic tokens
 	vim.highlight.priorities.treesitter = 100
 	vim.highlight.priorities.semantic_tokens = 95
+
+	setup_lsp()
 end
 
 return M

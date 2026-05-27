@@ -51,7 +51,7 @@ function M.config()
 				-- 'manual' will not select any item by default
 				-- 'auto_insert' will not select any item by default, and insert the completion items automatically when selecting them
 				selection = {
-					preselect = true,
+					preselect = false,
 					auto_insert = true,
 				},
 			},

@@ -434,7 +434,7 @@ function M.init()
 			desc = "Find files",
 		},
 		{
-			"<C-e>",
+			"<leader>e",
 			function()
 				snacks.picker.explorer()
 			end,

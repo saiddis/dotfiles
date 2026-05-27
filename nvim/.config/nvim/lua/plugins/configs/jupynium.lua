@@ -45,18 +45,18 @@ local M = {
 
 function M.init()
 	require("mappings").register({
-		{ "<leader>j", group = "Jupynium" },
-		{ "<leader>js", "<cmd>JupyniumStartAndAttachToServer<cr>", desc = "Start server + attach" },
-		{ "<leader>jS", "<cmd>JupyniumStartAndAttachToServerInTerminal<cr>", desc = "Start server (terminal)" },
-		{ "<leader>ja", "<cmd>JupyniumAttachToServer<cr>", desc = "Attach to server" },
-		{ "<leader>jn", "<cmd>JupyniumStartSync<cr>", desc = "Start sync" },
-		{ "<leader>jN", "<cmd>JupyniumStopSync<cr>", desc = "Stop sync" },
-		{ "<leader>jx", "<cmd>JupyniumExecuteSelectedCells<cr>", desc = "Execute selected cells" },
-		{ "<leader>jd", "<cmd>JupyniumDownloadIpynb<cr>", desc = "Download ipynb" },
-		{ "<leader>jk", "<cmd>JupyniumKernelSelect<cr>", desc = "Select kernel" },
-		{ "<leader>ji", "<cmd>JupyniumKernelInterrupt<cr>", desc = "Interrupt kernel" },
-		{ "<leader>jr", "<cmd>JupyniumKernelRestart<cr>", desc = "Restart kernel" },
-		{ "<leader>jt", "<cmd>JupyniumKernelOpenInTerminal<cr>", desc = "Open kernel terminal" },
+		{ "<leader>n", group = "Notebook" },
+		{ "<leader>ns", "<cmd>JupyniumStartAndAttachToServer<cr>", desc = "Start server + attach" },
+		{ "<leader>nS", "<cmd>JupyniumStartAndAttachToServerInTerminal<cr>", desc = "Start server (terminal)" },
+		{ "<leader>na", "<cmd>JupyniumAttachToServer<cr>", desc = "Attach to server" },
+		{ "<leader>nn", "<cmd>JupyniumStartSync<cr>", desc = "Start sync" },
+		{ "<leader>nN", "<cmd>JupyniumStopSync<cr>", desc = "Stop sync" },
+		{ "<leader>nx", "<cmd>JupyniumExecuteSelectedCells<cr>", desc = "Execute selected cells" },
+		{ "<leader>nd", "<cmd>JupyniumDownloadIpynb<cr>", desc = "Download ipynb" },
+		{ "<leader>nk", "<cmd>JupyniumKernelSelect<cr>", desc = "Select kernel" },
+		{ "<leader>ni", "<cmd>JupyniumKernelInterrupt<cr>", desc = "Interrupt kernel" },
+		{ "<leader>nr", "<cmd>JupyniumKernelRestart<cr>", desc = "Restart kernel" },
+		{ "<leader>nt", "<cmd>JupyniumKernelOpenInTerminal<cr>", desc = "Open kernel terminal" },
 		-- { "<leader>jk", "<cmd>JupyniumKernelHover<cr>", desc = "Jupinim inspect" },
 	})
 end

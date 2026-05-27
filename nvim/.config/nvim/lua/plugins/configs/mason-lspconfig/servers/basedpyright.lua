@@ -14,7 +14,8 @@ local settings = {
 	},
 
 	python = {
-		venvPath = "~/envs/",
+		venvPath = "/home/saiddis/.local/share/mamba/envs",
+		venv = "nvim",
 	},
 }
 
