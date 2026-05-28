@@ -16,6 +16,7 @@ local jupyter_command = expand("~/.local/share/mamba/envs/nvim/bin/jupyter")
 
 local M = {
 	"kiyoon/jupynium.nvim",
+	enabled = false,
 	build = vim.fn.executable(python_host) == 1 and (python_host .. " -m pip install .") or "pip3 install --user .",
 	dependencies = {
 		"stevearc/dressing.nvim",

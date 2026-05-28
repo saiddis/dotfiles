@@ -21,7 +21,7 @@ local M = {
 				provider = "openai",
 			},
 			lsp_keymaps = true,
-			lsp_cfg = true,
+			lsp_cfg = false,
 			-- other options
 		}
 	end,

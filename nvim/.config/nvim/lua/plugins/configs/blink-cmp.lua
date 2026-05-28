@@ -83,7 +83,7 @@ function M.config()
 		},
 
 		sources = {
-			default = { "lsp", "path", "buffer" },
+			default = { "lsp", "snippets", "path", "buffer" },
 			per_filetype = {
 				avante = { "avante", "thesaurus" },
 				octo = { "git" },

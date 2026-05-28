@@ -1,6 +1,6 @@
 local M = {
 	"saecki/live-rename.nvim",
-	enabled = false,
+	enabled = true,
 }
 
 function M.init()
