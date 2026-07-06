@@ -394,7 +394,7 @@ function M.init()
 		-- Files
 		--
 		{
-			"<leader>f",
+			"<leader>sf",
 			function()
 				fff_picker.picker()
 				-- snacks.picker.files({
@@ -443,7 +443,7 @@ function M.init()
 
 		-- Text
 		{
-			"<leader>s",
+			"<leader>sg",
 			function()
 				snacks.picker.grep()
 			end,
@@ -452,7 +452,7 @@ function M.init()
 
 		-- Buffers
 		{
-			"<leader>bl",
+			"<leader>sb",
 			function()
 				snacks.picker.buffers()
 			end,
@@ -488,14 +488,14 @@ function M.init()
 			desc = "Symbols",
 		},
 		{
-			"<leader>cS",
+			"<leader>sw",
 			function()
 				snacks.picker.lsp_workspace_symbols()
 			end,
 			desc = "Symbols (workspace)",
 		},
 		{
-			"<leader>u",
+			"<leader>su",
 			function()
 				snacks.picker.undo()
 			end,
@@ -511,42 +511,42 @@ function M.init()
 			desc = "Highlight list",
 		},
 		{
-			"<leader>ki",
+			"<leader>si",
 			function()
 				snacks.picker.icons()
 			end,
 			desc = "Icons list",
 		},
 		{
-			"<leader>kl",
+			"<leader>sl",
 			function()
 				snacks.picker.lsp_config()
 			end,
 			desc = "LSP servers",
 		},
 		{
-			"<leader>co",
+			"<leader>sc",
 			function()
 				snacks.picker.colorschemes()
 			end,
 			desc = "Colorschemes",
 		},
 		{
-			"<leader>q",
+			"<leader>sq",
 			function()
 				snacks.picker.qflist()
 			end,
 			desc = "Quickfix List",
 		},
 		{
-			"<leader>P",
+			"<leader>sp",
 			function()
 				snacks.picker.projects()
 			end,
 			desc = "Projects",
 		},
 		{
-			"<leader>d",
+			"<leader>sd",
 			function()
 				snacks.picker.diagnostics({
 					layout = "bottom",
@@ -560,14 +560,14 @@ function M.init()
 			desc = "Diagnostics",
 		},
 		{
-			"<leader>D",
+			"<leader>sD",
 			function()
 				snacks.picker.diagnostics_buffer()
 			end,
 			desc = "Buffer Diagnostics",
 		},
 		{
-			"<leader>h",
+			"<leader>sh",
 			function()
 				snacks.picker.help()
 			end,
