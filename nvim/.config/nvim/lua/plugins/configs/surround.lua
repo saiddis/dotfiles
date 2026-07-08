@@ -1,22 +1,30 @@
 local M = {
 	"kylechui/nvim-surround",
 	event = "VeryLazy",
-	init = function()
-		vim.g.nvim_surround_no_mappings = true
-	end,
 }
 
 function M.config()
-	require("nvim-surround").setup()
+	vim.g.nvim_surround_no_normal_mappings = true
+	vim.g.nvim_surround_no_visual_mappings = true
 
-	vim.keymap.set("i", "<C-g>s", "<Plug>(nvim-surround-insert)")
-	vim.keymap.set("i", "<C-g>S", "<Plug>(nvim-surround-insert-line)")
-	vim.keymap.set("n", "s", "<Plug>(nvim-surround-normal)")
-	vim.keymap.set("n", "ss", "<Plug>(nvim-surround-normal-cur)")
-	vim.keymap.set("x", "s", "<Plug>(nvim-surround-visual)")
-	vim.keymap.set("x", "gs", "<Plug>(nvim-surround-visual-line)")
-	vim.keymap.set("n", "ds", "<Plug>(nvim-surround-delete)")
-	vim.keymap.set("n", "cs", "<Plug>(nvim-surround-change)")
+	vim.keymap.set("n", "s", "<Plug>(nvim-surround-normal)", {
+		desc = "Add a surrounding pair around a motion (normal mode)",
+	})
+	vim.keymap.set("n", "ss", "<Plug>(nvim-surround-normal-cur)", {
+		desc = "Add a surrounding pair around the current line (normal mode)",
+	})
+	vim.keymap.set("n", "S", "<Plug>(nvim-surround-normal-line)", {
+		desc = "Add a surrounding pair around a motion, on new lines (normal mode)",
+	})
+	vim.keymap.set("n", "SS", "<Plug>(nvim-surround-normal-cur-line)", {
+		desc = "Add a surrounding pair around the current line, on new lines (normal mode)",
+	})
+	vim.keymap.set("x", "s", "<Plug>(nvim-surround-visual)", {
+		desc = "Add a surrounding pair around a visual selection",
+	})
+	vim.keymap.set("x", "gs", "<Plug>(nvim-surround-visual-line)", {
+		desc = "Add a surrounding pair around a visual selection, on new lines",
+	})
 end
 
 return M
