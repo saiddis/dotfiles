@@ -8,7 +8,7 @@ local M = {
 function M.config()
 	require("bento").setup({
 		main_keymap = "<C-;>",
-		max_open_buffers = 10,
+		max_open_buffers = 5,
 		map_last_accessed = false,
 		default_action = "open",
 		actions = {
