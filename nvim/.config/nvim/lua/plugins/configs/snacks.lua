@@ -461,7 +461,7 @@ function M.init()
 
 		-- Code
 		{
-			"<leader>cs",
+			"<leader>sc",
 			function()
 				snacks.picker.lsp_symbols({
 					layout = "left",
@@ -504,7 +504,7 @@ function M.init()
 
 		-- List
 		{
-			"<leader>kH",
+			"<leader>sH",
 			function()
 				snacks.picker.highlights()
 			end,
@@ -525,7 +525,7 @@ function M.init()
 			desc = "LSP servers",
 		},
 		{
-			"<leader>sc",
+			"<leader>so",
 			function()
 				snacks.picker.colorschemes()
 			end,

@@ -16,7 +16,7 @@ local jupyter_command = expand("~/.local/share/mamba/envs/nvim/bin/jupyter")
 
 local M = {
 	"kiyoon/jupynium.nvim",
-	enabled = false,
+	enabled = true,
 	build = vim.fn.executable(python_host) == 1 and (python_host .. " -m pip install .") or "pip3 install --user .",
 	dependencies = {
 		"stevearc/dressing.nvim",
@@ -121,10 +121,29 @@ function M.config()
 		},
 	})
 
-	vim.api.nvim_set_hl(0, "JupyniumCodeCellSeparator", { link = "CursorLine" })
-	vim.api.nvim_set_hl(0, "JupyniumMarkdownCellSeparator", { link = "CursorLine" })
-	vim.api.nvim_set_hl(0, "JupyniumMarkdownCellContent", { link = "Normal" })
-	vim.api.nvim_set_hl(0, "JupyniumMagicCommand", { link = "Keyword" })
+	-- Cell-by-cell navigation (jupynium files only).
+	-- The plugin's textobj module already integrates with
+	-- nvim-treesitter-textobjects, so `;` / `,` repeat the last cell jump.
+	local augroup = vim.api.nvim_create_augroup("JupyniumCellMotions", { clear = true })
+	vim.api.nvim_create_autocmd("BufWinEnter", {
+		group = augroup,
+		pattern = require("jupynium.options").opts.jupynium_file_pattern,
+		callback = function(event)
+			local textobj = require("jupynium.textobj")
+			vim.keymap.set(
+				{ "n", "x", "o" },
+				"<C-n>",
+				textobj.goto_next_cell_separator,
+				{ buffer = event.buf, desc = "Next Jupynium cell" }
+			)
+			vim.keymap.set(
+				{ "n", "x", "o" },
+				"<C-p>",
+				textobj.goto_previous_cell_separator,
+				{ buffer = event.buf, desc = "Previous Jupynium cell" }
+			)
+		end,
+	})
 end
 
 return M
