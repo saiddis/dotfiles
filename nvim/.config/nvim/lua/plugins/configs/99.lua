@@ -12,10 +12,8 @@ M.config = function()
 	local cwd = vim.uv.cwd()
 	local basename = vim.fs.basename(cwd)
 	_99.setup({
-		auto_add_skills = true,
-		provider = _99.Providers.KiroProvider,
-		-- model = "minimax-m2.1", -- fast
-		-- model = "qwen3-coder-next", -- slow but better
+		provider = _99.Providers.ClaudeCodeProvider, -- default: OpenCodeProvider
+		model = "opus-4.8",
 		logger = {
 			level = _99.DEBUG,
 			path = "/tmp/" .. basename .. ".99.debug",
