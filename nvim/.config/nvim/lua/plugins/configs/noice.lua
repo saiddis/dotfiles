@@ -2,7 +2,7 @@ local M = {
 	"folke/noice.nvim",
 	dependencies = {
 		"MunifTanjim/nui.nvim",
-		"Bekaboo/dropbar.nvim",
+		-- "Bekaboo/dropbar.nvim",
 	},
 	lazy = false,
 	cond = not vim.g.started_by_firenvim and not vim.g.vscode,
