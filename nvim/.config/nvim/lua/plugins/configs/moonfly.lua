@@ -42,6 +42,10 @@ local function apply_override_colors(colors)
 		FoldColumn = { bg = ui.bg_primary, fg = ui.fg_secondary },
 		CursorLineFold = { bg = ui.selected },
 		ColorColumn = { bg = ui.bg_secondary },
+		JupyniumMarkdownCellContent = { bg = ui.bg_primary },
+		JupyniumMagicCommand = { bg = ui.fg_primary },
+		JupyniumCodeCellSeparator = { bg = ui.bg_secondary },
+		JupyniumMarkdownCellSeparator = { bg = ui.bg_secondary },
 	}
 
 	for highlight, value in pairs(override_colors) do
