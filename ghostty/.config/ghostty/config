@@ -1,8 +1,8 @@
 theme = Paul Millr
 
-font-family = CodeNewRoman Nerd Font Mono
+font-family = JetBrainsMono Nerd Font
 
-font-size = 14.0
+font-size = 13.0
 gtk-titlebar = false
 cursor-color = #25FF5F
 mouse-hide-while-typing = true
@@ -11,16 +11,13 @@ window-decoration = true
 
 keybind = alt=toggle_secure_input
 keybind = ctrl+t=new_tab
-#keybind = alt+p=previous_tab
-#keybind = alt+n=next_tab
+# keybind = alt+p=previous_tab
+# keybind = alt+n=next_tab
 
-keybind = ctrl+shift+n=unbind
-keybind = super+ctrl+bracket_right=unbind
-keybind = ctrl+tab=unbind
-keybind = ctrl+shift+tab=unbind
+keybind = ctrl+w=close_tab:this
 
-keybind = alt+w=new_split:auto
-keybind = ctrl+shift+h=goto_split:left
-keybind = ctrl+shift+j=goto_split:bottom
-keybind = ctrl+shift+k=goto_split:top
-keybind = ctrl+shift+l=goto_split:right
+# keybind = alt+w=new_split:auto
+# keybind = ctrl+shift+h=goto_split:left
+# keybind = ctrl+shift+j=goto_split:bottom
+# keybind = ctrl+shift+k=goto_split:top
+# keybind = ctrl+shift+l=goto_split:right
