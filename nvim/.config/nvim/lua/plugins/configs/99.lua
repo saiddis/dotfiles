@@ -12,8 +12,8 @@ M.config = function()
 	local cwd = vim.uv.cwd()
 	local basename = vim.fs.basename(cwd)
 	_99.setup({
-		provider = _99.Providers.ClaudeCodeProvider, -- default: OpenCodeProvider
-		model = "opus-4.8",
+		provider = _99.Providers.OpenCodeProvider, -- default: OpenCodeProvider
+		model = "zai-coding-plan/glm-5.3-flash",
 		logger = {
 			level = _99.DEBUG,
 			path = "/tmp/" .. basename .. ".99.debug",
@@ -76,7 +76,7 @@ M.config = function()
 		--- /foo/AGENT.md
 		--- assuming that /foo is project root (based on cwd)
 		md_files = {
-			"AGENT.md",
+			"AGENTS.md",
 		},
 	})
 

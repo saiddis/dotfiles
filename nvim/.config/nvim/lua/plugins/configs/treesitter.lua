@@ -54,7 +54,6 @@ function M.config()
 			-- vim.wo.foldmethod = "expr"
 			-- vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 
-			vim.treesitter.query.set(language, "injections", "")
 			-- Highlighting
 			vim.treesitter.start(buf, language)
 		end,

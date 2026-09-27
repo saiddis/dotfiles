@@ -8,14 +8,14 @@ function M.init()
 
 	require("mappings").register({
 		{
-			"<leader>cf",
-			function(args)
-				formatting.format(args.buf)
+			"<leader>f",
+			function()
+				formatting.format(vim.api.nvim_get_current_buf())
 			end,
 			desc = "Format buffer",
 		},
 		{
-			"<leader>cF",
+			"<leader>F",
 			function()
 				local enabled = formatting.toggle_auto_format()
 				vim.notify(
@@ -31,68 +31,39 @@ end
 
 function M.config()
 	require("conform").setup({
-		format = {
+		default_format_opts = {
 			timeout_ms = 2000,
 			async = false,
 			quiet = false,
 		},
 
 		formatters_by_ft = {
-			-- Shell
+			go = { "goimports" },
 			sh = { "shfmt" },
-
-			-- Lua
 			lua = { "stylua" },
-
-			-- Python
 			python = { "ruff_fix", "ruff_format" },
 
-			-- C/C++
 			c = { "clang_format" },
 			cpp = { "clang_format" },
 
-			-- Golang
-			-- go = { "gofmt" },
-
-			-- Javascript/Typescript
-			javascript = { "prettierd" },
-			typescript = { "prettierd" },
+			-- javascript = { "prettierd" },
+			-- typescript = { "prettierd" },
 			javascriptreact = { "prettierd" },
 			["javascript.jsx"] = { "prettierd" },
 			typescriptreact = { "prettierd" },
 			["typescript.tsx"] = { "prettierd" },
-			-- vue = { "prettierd" },
 			svelte = { "prettierd" },
 
-			-- HTML
 			html = { "prettierd" },
-
-			-- CSS
 			css = { "prettierd" },
-
-			-- Markdown & notebooks
 			markdown = { "cbfmt" },
-			-- markdown = { "mdformat" },
-			-- markdown = { "prettierd" }, -- NOTE: prettierd sucks at markdown
-			-- quarto = { "prettierd" }, -- FIX: use global prettierd config to supply parser ("markdown") and to use 4 spaces
-
-			-- JSON
 			json = { "prettierd" },
-
-			-- YAML
 			yaml = { "prettierd" },
-
-			-- TOML
 			toml = { "taplo" },
-
-			-- Make/CMake
 			make = { "cmake_format" },
 			cmake = { "cmake_format" },
-
-			-- SQL
 			sql = { "sleek" },
 
-			-- Injected
 			["*"] = { "injected" },
 		},
 
