@@ -1,0 +1,68 @@
+{
+  "executionMode": "notebook",
+  "voiceFeaturesOnly": false,
+  "prompt": {
+    "currentTimeReminderMinutes": 30,
+    "heavySystemPromptOverwrite": true
+  },
+  "scope": {
+    "allProviders": "off",
+    "additionalProviders": []
+  },
+  "tools": {
+    "autoReasoning": true,
+    "customRustBinariesDir": "",
+    "viewImageFallback": true,
+    "applyPatchOnly": true,
+    "viewImageOnly": true
+  },
+  "ui": {
+    "statusLine": true,
+    "toolRenaming": true,
+    "compactTools": "on",
+    "codeModeDetails": true,
+    "backgroundShellWidget": true,
+    "backgroundShellToggleShortcut": "alt+w",
+    "backgroundShellPrevShortcut": "alt+q",
+    "backgroundShellNextShortcut": "alt+e",
+    "backgroundShellCloseShortcut": "alt+r"
+  },
+  "compaction": {
+    "contextManagement": "remote",
+    "hybridCompaction": true,
+    "responsesCompaction": false,
+    "portableSummary": false,
+    "v2UserMessageRetention": 64
+  },
+  "notebook": {
+    "maxHeapMiB": 4096,
+    "plainCommandOutput": true
+  },
+  "voice": {
+    "v3Voice": "cove",
+    "autoResumeRealtime": true,
+    "refreshRealtimeAfterCompaction": true,
+    "audioSetupCompleted": false,
+    "delegationAcknowledgements": true,
+    "forwardReasoningSummaries": true,
+    "dictationShortcut": "ctrl+alt+d",
+    "realtimeShortcut": "ctrl+alt+space",
+    "muteShortcut": "ctrl+alt+m",
+    "serverShortcut": "ctrl+alt+g",
+    "dictationShortcutMode": "push",
+    "contextModel": {
+      "provider": "openai-codex",
+      "modelId": "gpt-6-luna"
+    },
+    "contextReasoning": "high"
+  },
+  "openai": {
+    "fast": false,
+    "verbosity": "low",
+    "lunaCacheKeepaliveMinutes": 0,
+    "proxyResponsesLite": false,
+    "forceCachedWebSockets": true,
+    "cacheDiagnostics": "off",
+    "harnessIdentifierHeader": false
+  }
+}

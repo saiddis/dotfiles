@@ -1,0 +1,23 @@
+# Node dependencies
+node_modules
+
+# Editor state
+\.vim
+
+# Runtime files and machine-local state
+sessions
+auth\.json
+trust\.json
+models-store\.json
+crashes\.json
+config\.private\.json
+
+# Environment variables and secrets
+\.env$
+\.env\..*
+
+# Logs and temporary files
+.*\.log$
+.*\.tmp$
+.*\.swp$
+\.DS_Store

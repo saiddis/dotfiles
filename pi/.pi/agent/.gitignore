@@ -1,4 +1,5 @@
 # Dependencies
+node_modules
 node_modules/
 
 # Downloaded/generated executables
@@ -30,3 +31,4 @@ extensions/summaries/config.private.json.*.tmp
 # Local editor settings
 .vscode/
 .idea/
+.vim/

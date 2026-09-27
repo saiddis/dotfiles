@@ -1,0 +1,23 @@
+{
+  "apiKeyFile": "~/keys/typesafe.txt",
+  "endpoint": "https://jevtypesafeai.com/api/v1/decide",
+  "model": "jev-latest",
+  "maxStateChars": 8000,
+  "gate": {
+    "enabled": true,
+    "mode": "shadow",
+    "tools": ["bash", "write", "edit"],
+    "argumentChars": 400,
+    "cacheSeconds": 120,
+    "minConfidence": 0.5,
+    "blockWithoutUI": false,
+    "blockOn": { "destructive": 0.9, "exfiltration": 0.7, "beyondScope": 0.85, "impact": 2.5 }
+  },
+  "output": {
+    "enabled": true,
+    "tools": ["bash"],
+    "outputChars": 2000,
+    "leakThreshold": 0.9,
+    "minConfidence": 0.6
+  }
+}
