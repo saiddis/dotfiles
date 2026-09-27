@@ -1,0 +1,48 @@
+onboarding = false
+# herdr configuration
+# Keybindings ported from ~/.tmux.conf
+
+# [theme]
+# name = "catppuccin"
+# # Follow the host terminal's light/dark appearance.
+# auto_switch = true
+# dark_name = "catppuccin"          # mocha
+# light_name = "catppuccin-latte"
+
+[keys]
+# tmux: set -g prefix C-s
+prefix = "ctrl+b"
+
+# tmux: christoomey/vim-tmux-navigator — move between panes with ctrl+h/j/k/l,
+# no prefix needed. (tmux also had prefix h/j/k/l via bind-key select-pane.)
+focus_pane_left = "ctrl+shift+h"
+focus_pane_down = "ctrl+shift+j"
+focus_pane_up = "ctrl+shift+k"
+focus_pane_right = "ctrl+shift+l"
+
+# tmux: bind % split-window -h  (side-by-side panes, vertical divider)
+split_vertical = "prefix+|"
+# tmux: bind '"' split-window -v  (stacked panes, horizontal divider)
+split_horizontal = 'prefix+_'
+# tmux: bind c new-window
+new_tab = "ctrl+t"
+
+new_workspace = "prefix+n"
+
+next_workspace = "alt+n"
+previous_workspace = "alt+p"
+
+switch_tab = "alt+1..9"
+
+toggle_sidebar = "alt+e"
+
+# Notes on non-binding tmux settings (already herdr defaults, no config needed):
+#   set -g mouse on                -> [ui] mouse_capture = true (default)
+#   set-window-option mode-keys vi -> navigate mode uses h/j/k/l by default
+
+[ui.toast]
+delivery = "terminal"
+
+[theme]
+name = "vesper"
+auto_switch = false
