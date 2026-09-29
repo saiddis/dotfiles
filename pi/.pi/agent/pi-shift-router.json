@@ -1,0 +1,67 @@
+{
+  "enabled": true,
+  "tiers": {
+    "fast": {
+      "label": "Fast",
+      "models": [
+        {
+          "provider": "openai-codex",
+          "model": "gpt-6-luna",
+          "priority": 1
+        }
+      ],
+      "description": "Daily coding, debugging, following patterns — execution mode"
+    },
+    "smart": {
+      "label": "Smart",
+      "models": [
+        {
+          "provider": "openai-codex",
+          "model": "gpt-6-sol",
+          "priority": 1
+        }
+      ],
+      "description": "Architecture, planning, code review, trade-off analysis — judgment mode"
+    }
+  },
+  "routing": {
+    "mode": "auto",
+    "judgeTimeout": 15000,
+    "judge": {
+      "mode": "decision",
+      "models": [
+        { "provider": "jev-proxy", "model": "jev-latest", "priority": 1 }
+      ]
+    },
+    "window": {
+      "size": 5,
+      "minConfidence": 0.5
+    },
+    "economics": {
+      "reworkPenalty": 3,
+      "downgradeMemory": 2,
+      "mode": "default"
+    },
+    "cacheAware": {
+      "enabled": true,
+      "sameFamilyPenalty": 1.5,
+      "idleBoundaryMs": 300000
+    }
+  },
+  "ux": {
+    "quietMode": false,
+    "statusBar": true,
+    "inlineToast": true,
+    "routerLogVerbose": true
+  },
+  "orchestration": {
+    "mode": "auto",
+    "maxRounds": 3,
+    "escalationThreshold": 2,
+    "requireSmartModel": true,
+    "audit": {
+      "enabled": true,
+      "timeoutMs": 5000
+    }
+  }
+}
