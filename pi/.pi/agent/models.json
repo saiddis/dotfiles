@@ -1,0 +1,18 @@
+{
+  "providers": {
+    "jev-proxy": {
+      "baseUrl": "https://jevtypesafeai.com/api/v1/decide",
+      "api": "typesafe-decisions",
+      "apiKey": "$JEV_API_KEY",
+      "models": [
+        {
+          "id": "jev-latest",
+          "name": "Jev (decision judge)",
+          "input": ["text"],
+          "contextWindow": 64000,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "jev": {
+      "command": "npx",
+      "args": ["-y", "@jkudish/jev-mcp"],
+      "env": {
+        "JEV_PROVIDER": "compatible",
+        "JEV_API_BASE_URL": "https://jevtypesafeai.com/api/v1/decide",
+        "JEV_API_KEY": "$JEV_API_KEY"
+      }
+    },
+    "context-mode": {
+      "command": "context-mode"
+    }
+  }
+}
