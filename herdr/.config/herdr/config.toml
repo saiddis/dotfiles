@@ -29,8 +29,11 @@ new_tab = "ctrl+t"
 
 new_workspace = "prefix+n"
 
-next_workspace = "alt+n"
-previous_workspace = "alt+p"
+next_workspace = "alt+j"
+previous_workspace = "alt+k"
+
+next_tab = "alt+l"
+previous_tab = "alt+h"
 
 switch_tab = "alt+1..9"
 
@@ -42,6 +45,9 @@ toggle_sidebar = "alt+e"
 
 [ui.toast]
 delivery = "terminal"
+
+# [ui]
+# host_cursor = "native"
 
 [theme]
 name = "vesper"
