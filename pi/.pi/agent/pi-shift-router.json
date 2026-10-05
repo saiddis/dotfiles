@@ -1,5 +1,5 @@
 {
-  "enabled": true,
+  "enabled": false,
   "tiers": {
     "fast": {
       "label": "Fast",
@@ -17,8 +17,13 @@
       "models": [
         {
           "provider": "openai-codex",
-          "model": "gpt-6-sol",
+          "model": "gpt-6.1-sol",
           "priority": 1
+        },
+        {
+          "provider": "openai-codex",
+          "model": "gpt-6-sol",
+          "priority": 2
         }
       ],
       "description": "Architecture, planning, code review, trade-off analysis — judgment mode"
@@ -30,7 +35,11 @@
     "judge": {
       "mode": "decision",
       "models": [
-        { "provider": "jev-proxy", "model": "jev-latest", "priority": 1 }
+        {
+          "provider": "jev-proxy",
+          "model": "jev-latest",
+          "priority": 1
+        }
       ]
     },
     "window": {

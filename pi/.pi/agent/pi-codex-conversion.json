@@ -3,10 +3,10 @@
   "voiceFeaturesOnly": false,
   "prompt": {
     "currentTimeReminderMinutes": 30,
-    "heavySystemPromptOverwrite": true
+    "heavySystemPromptOverwrite": false
   },
   "scope": {
-    "allProviders": "off",
+    "allProviders": "on",
     "additionalProviders": []
   },
   "tools": {
@@ -28,11 +28,12 @@
     "backgroundShellCloseShortcut": "alt+r"
   },
   "compaction": {
-    "contextManagement": "remote",
-    "hybridCompaction": true,
-    "responsesCompaction": false,
-    "portableSummary": false,
-    "v2UserMessageRetention": 64
+    "v2UserMessageRetention": 64,
+    "continuity": "notes-and-compaction",
+    "historyStorage": "local",
+    "shareSubagentContext": true,
+    "idleNotesRollover": false,
+    "method": "both"
   },
   "notebook": {
     "maxHeapMiB": 4096,
