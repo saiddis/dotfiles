@@ -30,14 +30,14 @@ previous_workspace = "alt+p"
 
 switch_tab = "alt+1..9"
 
-toggle_sidebar = "alt+e"
+# toggle_sidebar = "alt+e"
 
 # Notes on non-binding tmux settings (already herdr defaults, no config needed):
 #   set -g mouse on                -> [ui] mouse_capture = true (default)
 #   set-window-option mode-keys vi -> navigate mode uses h/j/k/l by default
 
 [ui.toast]
-delivery = "terminal"
+delivery = "system"
 
 # [ui]
 # host_cursor = "native"
@@ -45,3 +45,48 @@ delivery = "terminal"
 [theme]
 name = "vesper"
 auto_switch = false
+
+
+[[keys.command]]
+key = "alt+e"
+type = "plugin_action"
+command = "beyondlex.herdr-recent-navigator.focus-workspaces"
+description = "Open Navigator: Workspace"
+
+
+# Optional: Focus Tabs/Panes/Agents when open navigator
+[[keys.command]]
+key = "alt+i"
+type = "plugin_action"
+command = "beyondlex.herdr-recent-navigator.focus-tabs"
+description = "Open Navigator: Tab"
+
+[[keys.command]]
+key = "prefix+u"
+type = "plugin_action"
+command = "beyondlex.herdr-recent-navigator.focus-panes"
+description = "Open Navigator: Pane"
+
+[[keys.command]]
+key = "prefix+o"
+type = "plugin_action"
+command = "beyondlex.herdr-recent-navigator.focus-agents"
+description = "Open Navigator: Agent"
+
+[[keys.command]]
+key = "prefix+t"
+type = "plugin_action"
+command = "beyondlex.herdr-recent-navigator.focus-previous-tab"
+description = "Jump to previous tab"
+
+[[keys.command]]
+key = "alt+y"
+type = "plugin_action"
+command = "beyondlex.herdr-recent-navigator.focus-previous-pane"
+description = "Jump to previous pane"
+
+[[keys.command]]
+key = "prefix+a"
+type = "plugin_action"
+command = "beyondlex.herdr-recent-navigator.focus-previous-agent"
+description = "Jump to previous agent"
