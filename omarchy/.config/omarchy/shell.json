@@ -1,0 +1,132 @@
+{
+  "bar": {
+    "background": "glassy",
+    "layout": {
+      "center": [
+        {
+          "format": "dddd HH:mm",
+          "formatAlt": "d MMMM 'W'ww yyyy",
+          "id": "omarchy.clock",
+          "verticalFormat": "HH\nmm"
+        }
+      ],
+      "centerBegin": [
+        {
+          "id": "omarchy.indicators"
+        }
+      ],
+      "centerEnd": [
+        {
+          "cities": [
+            {
+              "name": "Dushanbe",
+              "zone": "Asia/Dushanbe"
+            },
+            {
+              "name": "Tokyo",
+              "zone": "Asia/Tokyo"
+            },
+            {
+              "name": "Los Angeles",
+              "zone": "America/Los_Angeles"
+            },
+            {
+              "name": "New York",
+              "zone": "America/New_York"
+            },
+            {
+              "name": "London",
+              "zone": "Europe/London"
+            }
+          ],
+          "id": "omarchy.elsewhen"
+        },
+        {
+          "id": "omarchy.weather"
+        },
+        {
+          "id": "omarchy.system-update"
+        }
+      ],
+      "left": [
+        {
+          "id": "omarchy.menu"
+        },
+        {
+          "id": "tornikegomareli.spaces",
+          "persistentWorkspaces": 0
+        }
+      ],
+      "right": [
+        {
+          "id": "omarchy.tray"
+        },
+        {
+          "id": "saiddis.keyboard-layout"
+        },
+        {
+          "id": "omarchy.agents"
+        },
+        {
+          "id": "omarchy.bluetooth"
+        },
+        {
+          "id": "omarchy.network"
+        },
+        {
+          "id": "omarchy.audio"
+        },
+        {
+          "id": "omarchy.monitor"
+        },
+        {
+          "id": "omarchy.power"
+        }
+      ],
+      "tray": [
+        {
+          "id": "superwhisper.panel"
+        }
+      ]
+    },
+    "position": "left"
+  },
+  "cloneSourceRestores": [
+    "saiddis.notifications",
+    "saiddis.lock"
+  ],
+  "disabledPlugins": [
+    "omarchy.dock",
+    "omarchy.notifications",
+    "omarchy.lock"
+  ],
+  "idle": {
+    "lock": 300,
+    "screensaver": 150
+  },
+  "plugins": [
+    {
+      "animationStyle": "zoom",
+      "backgroundBlur": 12,
+      "backgroundDim": 55,
+      "backgroundMode": "wallpaper",
+      "hotCornerEnabled": false,
+      "id": "expose.window-overview",
+      "selectionStyle": "lift",
+      "showFooter": true,
+      "windowFooterStyle": "centered",
+      "windowLayout": "grid",
+      "workspaceLabelStyle": "slot"
+    },
+    {
+      "id": "typecraft.omacast"
+    },
+    {
+      "id": "saiddis.notifications"
+    },
+    {
+      "id": "saiddis.lock"
+    }
+  ],
+  "version": 1
+}

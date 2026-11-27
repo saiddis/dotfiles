@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# Checks that this setup is still in place: every config a link into this
+# repo, Omarchy's Neovim theme link, the listed plugins and themes, the
+# device-notify service, Hyprland's config free of errors. Then shows what
+# changed in the repo (Omarchy, an app or an update writing to a config
+# lands there, since the folders are linked). Changes nothing; ./install
+# fixes what it reports.
+set -uo pipefail
+
+DOTFILES=$(cd "$(dirname "$0")" && pwd)
+source "$DOTFILES/setup/layout.sh"
+
+problems=0
+bad() { printf '  \e[31m✗\e[0m %s\n' "$*"; problems=$((problems + 1)); }
+links_to() { [[ -L $1 ]] && [[ $(readlink -f "$1") == "$(readlink -f "$2")" ]]; }
+entries() { sed -e 's/#.*//' -e '/^[[:space:]]*$/d' "$DOTFILES/setup/$1"; }
+describe() {
+  if [[ -L $1 ]]; then echo "a link to $(readlink "$1")"
+  elif [[ -e $1 ]]; then echo "a plain $( [[ -d $1 ]] && echo folder || echo file)"
+  else echo "missing"; fi
+}
+
+for pkg in "${PACKAGES[@]}"; do
+  if [[ " ${FOLDED[*]} " == *" $pkg "* ]]; then
+    target="$HOME/.config/$pkg"
+    links_to "$target" "$DOTFILES/$pkg/.config/$pkg" || bad "~/.config/$pkg is $(describe "$target"), not this repo's $pkg/"
+  else
+    while IFS= read -r -d '' file; do
+      rel=${file#"$DOTFILES/$pkg/"}
+      links_to "$HOME/$rel" "$file" || bad "~/$rel is $(describe "$HOME/$rel") (a save replaced the link?), not this repo's"
+    done < <(find "$DOTFILES/$pkg" \( -type f -o -type l \) -not -name '.stow-local-ignore' -print0)
+  fi
+done
+
+links_to "$NVIM_THEME_LINK" "$NVIM_THEME_TARGET" || bad "Neovim's theme.lua is $(describe "$NVIM_THEME_LINK"), not a link to the current Omarchy theme"
+
+while read -r id _; do
+  [[ -e $HOME/.config/omarchy/plugins/$id ]] || bad "Omarchy plugin $id is missing"
+done < <(entries omarchy-plugins.txt)
+while read -r name _; do
+  [[ -e $HOME/.config/omarchy/themes/$name ]] || bad "Omarchy theme $name is missing"
+done < <(entries omarchy-themes.txt)
+
+[[ $(systemctl --user is-enabled device-notify.service 2>/dev/null) == enabled ]] || bad "device-notify.service isn't enabled"
+
+if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+  errors=$(hyprctl configerrors 2>/dev/null | grep -v '^$')
+  [[ -z $errors || $errors == "no errors" ]] || bad "Hyprland config errors: $errors"
+fi
+
+if (( problems )); then
+  printf '%d problem(s); ./install fixes links, plugins, themes and the service\n' "$problems"
+else
+  echo "All in place."
+fi
+
+changes=$(git -C "$DOTFILES" status --short)
+if [[ -n $changes ]]; then
+  echo
+  echo "Changed in the repo (review, then commit):"
+  echo "$changes" | sed 's/^/  /'
+fi
+exit $(( problems > 0 ))

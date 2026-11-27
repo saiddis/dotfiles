@@ -1,1 +1,25 @@
 **/.vim/
+
+# --- Omarchy (~/.config/omarchy is this folder, linked whole) ---------------
+# Other people's shell plugins and themes: cloned again by ./install from
+# setup/omarchy-plugins.txt and setup/omarchy-themes.txt, never committed.
+/omarchy/.config/omarchy/plugins/*
+!/omarchy/.config/omarchy/plugins/saiddis.*/
+/omarchy/.config/omarchy/themes/*
+!/omarchy/.config/omarchy/themes/moonfly/
+# Lock files and Omarchy's own sample hooks and templates
+/omarchy/.config/omarchy/defaults/*.lock
+/omarchy/.config/omarchy/**/*.sample
+
+# --- Neovim -------------------------------------------------------------------
+# Omarchy's link to the current theme's neovim.lua (./install makes it)
+/nvim/.config/nvim/lua/plugins/theme.lua
+
+# --- fcitx5 -------------------------------------------------------------------
+/fcitx5/.config/fcitx5/*.bak.*
+/fcitx5/.config/fcitx5/conf/cached_layouts
+
+# --- anywhere -------------------------------------------------------------------
+__pycache__/
+*.bak
+*.bak.*

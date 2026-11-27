@@ -1,0 +1,26 @@
+# Alt+Shift (a Hyprland binding) switches en/ru; Super+I is unbound. Leave Ctrl+Space to herdr and other Super keys to the desktop.
+[Hotkey/TriggerKeys]
+0=Zenkaku_Hankaku
+1=Hangul
+
+[Hotkey/ActivateKeys]
+0=Henkan
+
+[Hotkey/DeactivateKeys]
+0=Muhenkan
+
+# No lone-Shift switch: with English and Russian it flipped the language on every
+# Shift tap. Alt+Shift switches them, through a Hyprland binding (bindings.lua).
+[Hotkey/AltTriggerKeys]
+
+[Hotkey/EnumerateGroupForwardKeys]
+
+[Hotkey/EnumerateGroupBackwardKeys]
+
+[Behavior]
+ActiveByDefault=False
+# fcitx's own "Russian" popup sits at the text cursor, so outside a text field
+# it lands wherever the last one was, or nowhere. The Alt+Shift binding shows
+# an Omarchy OSD instead, and the bar's layout label follows the window.
+ShowInputMethodInformation=False
+ShowInputMethodInformationWhenFocusIn=False

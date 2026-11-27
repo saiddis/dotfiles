@@ -1,0 +1,8 @@
+# Other people's Omarchy themes, as "<name> <git url>". ./install clones the
+# missing ones into ~/.config/omarchy/themes (what `omarchy theme install`
+# does, without switching to each). Moonfly is in this repo.
+castle-on-a-lake   https://github.com/shmall03/omarchy-castle-on-a-lake-theme.git
+modus-vivendi      https://github.com/codingquark/omarchy-modus-vivendi-theme
+omadore-64         https://github.com/rogunlimited-hub/omarchy-omadore-64-theme
+saimper-glass      https://github.com/Saimper/omarchy-saimper-glass-theme
+spectrum           https://github.com/WhiskeyTangoFussell/omarchy-spectrum-theme.git

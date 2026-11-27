@@ -1,25 +1,57 @@
-onboarding = false
 # herdr configuration
-# Keybindings ported from ~/.tmux.conf
+# Keybindings ported from ~/.tmux.conf. ~/.config/herdr/config.toml is a
+# symlink to this file.
 
-# [theme]
-# name = "catppuccin"
-# # Follow the host terminal's light/dark appearance.
-# auto_switch = true
-# dark_name = "catppuccin"          # mocha
-# light_name = "catppuccin-latte"
+# Skip the first-run tour
+onboarding = false
+
+[theme]
+# Draw on the terminal's own palette, so herdr follows the Omarchy theme
+# (Moonfly) that Ghostty is using.
+name = "terminal"
+auto_switch = false
+
+[theme.custom]
+# The tab bar sits on the terminal's own background, so it turns see-through
+# with the rest of the terminal under Glassy windows. With no panel_bg the
+# active tab's text falls back to surface_dim. surface_dim also draws the thin
+# divider line inside the sidebar's last cell (whose background is always
+# sidebar_bg), so it uses the sidebar colour to hide the line.
+panel_bg = "reset"
+surface_dim = "#121212"
+# Sidebar like T3 Code's (Moonfly colours): neutral black panel, grey active row
+sidebar_bg = "#121212"
+active_row_bg = "#262626"
+# Pane frames: the focused pane is drawn in the accent (Moonfly blue, as on
+# Hyprland's focused window), the rest in overlay0. herdr also uses overlay0
+# for the sidebar's section labels (spaces, new, menu, agents), so it is a
+# mid grey: well below the blue in brightness, still legible on the sidebar
+accent = "#80a0ff"
+overlay0 = "#6c6c6c"
+# mauve draws the git branch under each sidebar workspace and the RESIZE
+# mode badge. Moonfly turquoise: the branch reads like the shell prompt's
+# (starship italic cyan), and resize mode gets its own colour next to copy
+# mode's blue, as Neovim's statusline colours each mode
+mauve = "#79dac8"
+
+[terminal]
+# New splits, tabs and workspaces open in the focused pane's directory
+new_cwd = "follow"
 
 [keys]
-# tmux: set -g prefix C-s
 prefix = "ctrl+b"
+# Ghostty reports ? as shift+slash, so herdr's default "prefix+?" never fires
+help = "prefix+shift+slash"
 
-# tmux: christoomey/vim-tmux-navigator — move between panes with ctrl+h/j/k/l,
-# no prefix needed. (tmux also had prefix h/j/k/l via bind-key select-pane.)
+# tmux: christoomey/vim-tmux-navigator — ctrl+h/j/k/l move between panes with
+# no prefix. herdr-splits does this (see the [[keys.command]] entries below),
+# so the same keys also move between Neovim splits.
 
-# tmux: bind % split-window -h  (side-by-side panes, vertical divider)
-split_vertical = "prefix+|"
-# tmux: bind '"' split-window -v  (stacked panes, horizontal divider)
-split_horizontal = 'prefix+_'
+# tmux: bind % split-window -h  (side-by-side panes, vertical divider).
+# Ghostty reports | as shift+backslash, so "prefix+|" never matches.
+split_vertical = "prefix+shift+backslash"
+# tmux: bind '"' split-window -v  (stacked panes, horizontal divider); _ is shift+minus
+split_horizontal = "prefix+shift+minus"
 # tmux: bind c new-window
 new_tab = "ctrl+t"
 
@@ -27,51 +59,146 @@ new_workspace = "prefix+n"
 
 next_workspace = "alt+n"
 previous_workspace = "alt+p"
+# prefix+n is new_workspace above, which shadowed herdr's default next-tab
+# (prefix+n), so step through tabs with prefix+, and prefix+. (< and >)
+previous_tab = "prefix+comma"
+next_tab = "prefix+period"
+# ...and SHIFT carries the tab along, as everywhere else: prefix + < / >
+move_tab_previous = "prefix+shift+comma"
+move_tab_next = "prefix+shift+period"
+# prefix+o opens the agent navigator below
+open_notification_target = "prefix+shift+o"
+# Same grammar as Hyprland one layer down: CTRL moves focus between splits
+# (ctrl+hjkl, herdr-splits below), CTRL + SHIFT carries the pane along (swap),
+# CTRL + ALT + SHIFT resizes. Hyprland: ALT, ALT + SHIFT, ALT + CTRL.
+swap_pane_left = ["ctrl+shift+h", "prefix+shift+h"]
+swap_pane_down = ["ctrl+shift+j", "prefix+shift+j"]
+swap_pane_up = ["ctrl+shift+k", "prefix+shift+k"]
+swap_pane_right = ["ctrl+shift+l", "prefix+shift+l"]
+# Stated so SUPER + CTRL + K lists it (herdr's default)
+copy_mode = "prefix+["
+# Clear the pane: ctrl+l belongs to pane navigation (tmux-navigator idiom)
+clear_pane = "prefix+ctrl+l"
 
 switch_tab = "alt+1..9"
-
-# toggle_sidebar = "alt+e"
 
 # Notes on non-binding tmux settings (already herdr defaults, no config needed):
 #   set -g mouse on                -> [ui] mouse_capture = true (default)
 #   set-window-option mode-keys vi -> navigate mode uses h/j/k/l by default
 
+[ui]
+# Moonfly blue, the same accent as Hyprland's focused-window border
+accent = "#80a0ff"
+# Every pane gets its own frame, so the focused one can light up in the
+# accent while the others stay grey (shared dividers can't show focus)
+pane_gaps = true
+pane_outer_borders = true
+# Frame panes only once a tab is split; a lone pane needs no focus frame
+pane_borders = "auto"
+pane_scrollbars = false
+# Narrower sidebar: half-width Hyprland columns are ~115 columns wide
+sidebar_width = 20
+sidebar_min_width = 16
+confirm_close = false
+prompt_new_tab_name = false
+# Zoom already shows on the tab itself ("1 Z")
+tab_bar_right = []
+# Workspaces opened in the same directory would otherwise share a name
+prompt_new_workspace_name = true
+# What Hyprland shows as the window title
+window_title = "{hostname}: {workspace}"
+
 [ui.toast]
 delivery = "system"
 
-# [ui]
-# host_cursor = "native"
+# herdr-splits (lmilojevicc/herdr-splits.nvim): ctrl+h/j/k/l move between
+# herdr panes and Neovim splits as one layout. In a pane running Neovim the key
+# is forwarded to Neovim, which moves between its own splits and hands back to
+# herdr at its edge.
+[[keys.command]]
+key = "ctrl+h"
+type = "plugin_action"
+command = "herdr-splits.nav-left"
+description = "Focus split left (herdr or Neovim)"
 
-[theme]
-name = "vesper"
-auto_switch = false
+[[keys.command]]
+key = "ctrl+j"
+type = "plugin_action"
+command = "herdr-splits.nav-down"
+description = "Focus split down (herdr or Neovim)"
 
+[[keys.command]]
+key = "ctrl+k"
+type = "plugin_action"
+command = "herdr-splits.nav-up"
+description = "Focus split up (herdr or Neovim)"
 
+[[keys.command]]
+key = "ctrl+l"
+type = "plugin_action"
+command = "herdr-splits.nav-right"
+description = "Focus split right (herdr or Neovim)"
+
+# Resize the split the same way. alt+h/j/k/l (the plugin's default) belong to
+# Hyprland, which uses alt+ctrl+h/j/k/l to resize windows, so splits take one
+# more modifier: alt+ctrl+shift+h/j/k/l. Neovim receives alt+h/j/k/l.
+[[keys.command]]
+key = "ctrl+alt+shift+h"
+type = "plugin_action"
+command = "herdr-splits.resize-left"
+description = "Move split border left (herdr or Neovim)"
+
+[[keys.command]]
+key = "ctrl+alt+shift+j"
+type = "plugin_action"
+command = "herdr-splits.resize-down"
+description = "Move split border down (herdr or Neovim)"
+
+[[keys.command]]
+key = "ctrl+alt+shift+k"
+type = "plugin_action"
+command = "herdr-splits.resize-up"
+description = "Move split border up (herdr or Neovim)"
+
+[[keys.command]]
+key = "ctrl+alt+shift+l"
+type = "plugin_action"
+command = "herdr-splits.resize-right"
+description = "Move split border right (herdr or Neovim)"
+
+# ctrl+k is pane navigation, so the shell's kill-line moves behind the prefix
+# (the vim-tmux-navigator idiom). prefix+ctrl+l clears the pane ([keys] above).
+[[keys.command]]
+key = "prefix+ctrl+k"
+type = "shell"
+command = '"$HERDR_BIN_PATH" pane send-keys "$HERDR_ACTIVE_PANE_ID" ctrl+k'
+description = "Kill to end of line (sends Ctrl + K)"
+
+# Recent Navigator (beyondlex/herdr-recent-navigator); its own keys (j/k list,
+# h/l category, / filter) are in plugins/config/beyondlex.herdr-recent-navigator/config.toml
 [[keys.command]]
 key = "alt+e"
 type = "plugin_action"
 command = "beyondlex.herdr-recent-navigator.focus-workspaces"
-description = "Open Navigator: Workspace"
+description = "Recent navigator (workspaces)"
 
-
-# Optional: Focus Tabs/Panes/Agents when open navigator
 [[keys.command]]
 key = "alt+i"
 type = "plugin_action"
 command = "beyondlex.herdr-recent-navigator.focus-tabs"
-description = "Open Navigator: Tab"
+description = "Recent navigator (tabs)"
 
 [[keys.command]]
 key = "prefix+u"
 type = "plugin_action"
 command = "beyondlex.herdr-recent-navigator.focus-panes"
-description = "Open Navigator: Pane"
+description = "Recent navigator (panes)"
 
 [[keys.command]]
 key = "prefix+o"
 type = "plugin_action"
 command = "beyondlex.herdr-recent-navigator.focus-agents"
-description = "Open Navigator: Agent"
+description = "Recent navigator (agents)"
 
 [[keys.command]]
 key = "prefix+t"
@@ -83,7 +210,7 @@ description = "Jump to previous tab"
 key = "alt+y"
 type = "plugin_action"
 command = "beyondlex.herdr-recent-navigator.focus-previous-pane"
-description = "Jump to previous pane"
+description = "Jump to previous pane (any workspace)"
 
 [[keys.command]]
 key = "prefix+a"

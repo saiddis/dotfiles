@@ -1,0 +1,15 @@
+# Packages this setup adds to a stock Omarchy install (Omarchy already brings
+# herdr, superwhisper, fcitx5, chromium, owe, ...). ./install adds whichever
+# are missing: plain names from the Arch and Omarchy repos, aur: from the AUR.
+stow
+ghostty
+neovim
+openssh
+tailscale
+usbmuxd
+zen-browser-bin
+minecraft-launcher
+python-gobject      # bin/device-notify (GLib main loop)
+socat               # Omarchy hook theme-set.d/10-owe-sync
+aur:evremap-git     # keyboard remaps (evremap/, then evremap/install-systemd.sh)
+aur:whitesur-icon-theme  # icons.theme of my Moonfly (WhiteSur-dark)

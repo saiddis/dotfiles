@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "saiddis.keyboard-layout",
+  "name": "Keyboard layout (fcitx)",
+  "version": "1.0.0",
+  "author": "saiddis, from Omarchy",
+  "description": "Current input language (fcitx keyboard methods or xkb layout), click cycles",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "KeyboardLayout.qml"
+  },
+  "barWidget": {
+    "displayName": "Keyboard layout (fcitx)",
+    "description": "Current input language (fcitx keyboard methods or xkb layout), click cycles",
+    "category": "Compositor",
+    "defaultSection": "right",
+    "allowMultiple": false
+  },
+  "omarchy": {
+    "clonedFrom": "omarchy.keyboard-layout"
+  }
+}
