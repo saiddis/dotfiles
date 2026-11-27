@@ -52,8 +52,14 @@ while read -r pkg; do
     pacman -Qq "$pkg" >/dev/null 2>&1 || repo+=("$pkg")
   fi
 done < <(entries packages.txt | awk '{print $1}')
-(( ${#repo[@]} )) && run omarchy pkg add "${repo[@]}"
-(( ${#aur[@]} )) && run omarchy pkg aur add "${aur[@]}"
+# A failed install (no sudo password, say) is reported, not fatal: the
+# links still matter
+if (( ${#repo[@]} )); then
+  run omarchy pkg add "${repo[@]}" || echo "  couldn't install ${repo[*]}; rerun from a terminal"
+fi
+if (( ${#aur[@]} )); then
+  run omarchy pkg aur add "${aur[@]}" || echo "  couldn't install ${aur[*]}; rerun from a terminal"
+fi
 (( ${#repo[@]} + ${#aur[@]} )) || echo "  all there"
 
 # Moves a path out of the way, keeping its place under $HOME in the backup
