@@ -295,7 +295,7 @@ end
 hl.unbind("SUPER + F")
 o.bind("ALT + F", "Full width / half width", toggle_full_width)
 
--- No dock (rosakodu.dock is disabled; the launcher and ALT + O cover it), so
+-- No dock (the launcher and ALT + O cover it), so
 -- minimising would hide a window with nowhere to bring it back from.
 hl.unbind("SUPER + M")
 
