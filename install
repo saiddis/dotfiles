@@ -95,11 +95,14 @@ for pkg in "${PACKAGES[@]}"; do
     while IFS= read -r -d '' file; do
       rel=${file#"$DOTFILES/$pkg/"}
       target="$HOME/$rel"
+      # Inside a folder an older stow run linked whole: restow below
+      # unfolds it; moving the file would move the repo's own copy
+      if [[ $(readlink -f "$(dirname "$target")") == "$DOTFILES"/* ]]; then
+        need=1
+        continue
+      fi
       links_to "$target" "$file" && continue
       need=1
-      # Already the repo's file, through a folder an older stow run linked
-      # whole: restow below unfolds it; moving it would move the repo file
-      [[ $(readlink -f "$target") == "$(readlink -f "$file")" ]] && continue
       [[ -e $target || -L $target ]] && backup "$target"
     done < <(find "$DOTFILES/$pkg" \( -type f -o -type l \) -not -name '.stow-local-ignore' -print0)
   fi
@@ -120,6 +123,7 @@ done
 if ! links_to "$NVIM_THEME_LINK" "$NVIM_THEME_TARGET"; then
   # Omarchy's own link is relative, which breaks once ~/.config/nvim is a
   # link into this repo; this one is absolute
+  [[ -e $NVIM_THEME_LINK && ! -L $NVIM_THEME_LINK ]] && backup "$NVIM_THEME_LINK"
   run ln -sfn "$NVIM_THEME_TARGET" "$NVIM_THEME_LINK"
 fi
 
