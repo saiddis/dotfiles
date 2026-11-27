@@ -1,0 +1,14 @@
+[Unit]
+Description=evremap keyboard remapper (%i)
+Documentation=https://github.com/wez/evremap
+After=systemd-udevd.service
+
+[Service]
+WorkingDirectory=/
+# %i = config name in ~/.config/evremap, e.g. keychron-remap -> keychron-remap.toml
+ExecStart=/usr/bin/evremap remap /home/saiddis/.config/evremap/%i.toml --wait-for-device -d 0
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

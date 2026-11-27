@@ -1,0 +1,232 @@
+#!/usr/bin/env python3
+"""SUPER + K: Omarchy's keybinding sheet, cleaned up so every row is true.
+
+omarchy-menu-keybindings lists two hard-coded web-app rows that are not real
+binds here (ALT + SHIFT + L moves a window), the second half of ALT + TAB as
+its own row, Superwhisper's pass-through Escape, raw keysyms, and cuts
+descriptions at their first comma. This keeps everything else, restores the
+full descriptions, merges chords that do the same job into one row, folds
+numbered runs into one row (SUPER + 1..0 → Switch to workspace N, as the herdr
+sheet does), puts the ALT window grammar near the top, and writes every chord
+one way: SUPER + CTRL + ALT + SHIFT + KEY, as in the herdr sheet
+(SUPER + CTRL + K, herdr-keybindings-menu). Both sheets put the arrow in
+the same column.
+
+Usage: keybindings-menu [--print]
+"""
+import json
+import os
+import re
+import subprocess
+import sys
+
+env = dict(os.environ)
+env.pop("LD_LIBRARY_PATH", None)
+
+# Descriptions that are untrue on this desktop
+RENAME = {
+    "Toggle top bar": "Toggle bar",  # the bar sits on the left (shell.json)
+    "Toggle menu": "Toggles menu",  # opens Omarchy's toggles menu; it hides nothing
+}
+# Related rows Omarchy lists far apart, shown together (first, then second),
+# where the first of them appears
+PAIRS = [
+    ("Monitor scaling up", "Monitor scaling down"),
+    ("Zoom in", "Reset zoom"),
+]
+DROP = {
+    "Copy URL from Web App",  # hard-coded in omarchy-menu-keybindings
+    "Download Video from Web App",
+    "Reveal active window on top",  # second half of ALT + TAB
+    "Superwhisper: cancel",  # pass-through Escape while recording
+}
+# The ALT layer (bindings.lua), right after SUPER + K
+FIRST = [
+    "Focus column left", "Focus column right",
+    "Focus down (or workspace)", "Focus up (or workspace)",
+    "Move window to column left", "Move window to column right",
+    "Move window down (or workspace)", "Move window up (or workspace)",
+    "Make window narrower", "Make window wider", "Make window taller", "Make window shorter",
+    "Full width / half width", "Overview (Exposé)", "Launcher (omacast)",
+    "Clipboard history (omacast)", "Go to first empty workspace", "Herdr keybindings",
+]
+KEYS = {
+    "Alt_R": "RIGHT ALT", "Alt_L": "LEFT ALT", "Shift_L": "LEFT SHIFT",
+    "mouse_down": "SCROLL DOWN", "mouse_up": "SCROLL UP",
+    "~": "`", "grave": "`", "GRAVE": "`",
+    # punctuation as symbols, the same convention as the herdr sheet
+    "BRACKETLEFT": "[", "BRACKETRIGHT": "]", "COMMA": ",", "PERIOD": ".",
+    "SLASH": "/", "MINUS": "-", "EQUAL": "=", "SEMICOLON": ";", "APOSTROPHE": "'",
+    "BACKSLASH": "\\",
+    "XF86MonBrightnessUp": "BRIGHTNESS UP", "XF86MonBrightnessDown": "BRIGHTNESS DOWN",
+    "XF86KbdBrightnessUp": "KBD LIGHT UP", "XF86KbdBrightnessDown": "KBD LIGHT DOWN",
+    "XF86KbdLightOnOff": "KBD LIGHT", "XF86AudioRaiseVolume": "VOLUME UP",
+    "XF86AudioLowerVolume": "VOLUME DOWN", "XF86AudioMute": "MUTE",
+    "XF86AudioMicMute": "MIC MUTE", "XF86AudioPlay": "PLAY", "XF86AudioPause": "PAUSE",
+    "XF86AudioNext": "NEXT TRACK", "XF86AudioPrev": "PREVIOUS TRACK",
+    "XF86PowerOff": "POWER", "XF86Calculator": "CALCULATOR", "XF86Eject": "EJECT",
+    "XF86TouchpadToggle": "TOUCHPAD", "XF86TouchpadOn": "TOUCHPAD ON",
+    "XF86TouchpadOff": "TOUCHPAD OFF",
+}
+ORDER = ["SUPER", "CTRL", "ALT", "SHIFT"]
+# The media keys, kept together in one predictable order (Omarchy's list
+# interleaves them by modifier, which put Next and Previous track 8 rows apart)
+MEDIA = [
+    "Volume up", "Volume down", "Volume up precise", "Volume down precise",
+    "Mute", "Mute microphone", "Switch audio output",
+    "Play", "Pause", "Next track", "Previous track", "Switch media source",
+    "Brightness up", "Brightness down", "Brightness up precise", "Brightness down precise",
+    "Brightness maximum", "Brightness minimum",
+    "Keyboard brightness up", "Keyboard brightness down", "Keyboard backlight cycle",
+    "Eject media",
+]
+
+
+def run(*cmd):
+    return subprocess.run(cmd, capture_output=True, text=True, env=env).stdout
+
+
+def key_name(key):
+    if key in KEYS:
+        return KEYS[key]
+    if key.upper() in KEYS:
+        return KEYS[key.upper()]
+    if key.startswith("XF86"):  # any other media key: XF86AudioStop -> AUDIO STOP
+        return re.sub(r"(?<=[a-z])(?=[A-Z])", " ", key[4:]).upper()
+    return key.upper()
+
+
+def chord_order(c):
+    """Keyboard chords before mouse ones, and a bare key before a chord, so
+    "ALT + PLAY / NEXT TRACK" can't read as if ALT held for both."""
+    return ("SCROLL" in c or "MOUSE" in c, " + " in c)
+
+
+def chord(text):
+    if " / " in text:
+        return " / ".join(sorted((chord(part) for part in text.split(" / ")), key=chord_order))
+    text = text.strip()
+    mods_part, sep, key = text.rpartition(" + ")
+    if not sep:
+        mods_part, key = "", text
+    mods = mods_part.split()
+    key = key_name(key)
+    # A modifier key held with its own modifier (ALT + RIGHT ALT) is just the key
+    mods = [m for m in ORDER if m in mods and m not in key.split()]
+    return " + ".join(mods + [key])
+
+
+def full_descriptions():
+    """Omarchy's --print cuts a description at its first comma."""
+    full = {}
+    try:
+        for b in json.loads(run("hyprctl", "binds", "-j") or "[]"):
+            d = b.get("description") or ""
+            if "," in d:
+                full[d.split(",")[0]] = d
+    except ValueError:
+        pass
+    return full
+
+
+def fold_numbered(rows):
+    """SUPER + 1 .. SUPER + 0 → Switch to workspace 1..10 become one row."""
+    out, groups = [], {}
+    for keys, desc in rows:
+        k = re.fullmatch(r"(.* \+ )(\d)", keys)
+        d = re.fullmatch(r"(.*?)(\d+)", desc)
+        if k and d and int(k.group(2) or 0) % 10 == int(d.group(2)) % 10:
+            group = (k.group(1), d.group(1))
+            if group not in groups:
+                groups[group] = []
+                out.append(group)
+            groups[group].append(int(d.group(2)))
+            continue
+        out.append([keys, desc])
+    rows = []
+    for item in out:
+        if isinstance(item, list):
+            rows.append(item)
+            continue
+        prefix, stem = item
+        nums = sorted(groups[item])
+        if len(nums) == 1:
+            rows.append([f"{prefix}{nums[0] % 10}", f"{stem}{nums[0]}"])
+        else:
+            rows.append([f"{prefix}{nums[0] % 10}..{nums[-1] % 10}", f"{stem}{nums[0]}..{nums[-1]}"])
+    return rows
+
+
+def records():
+    full = full_descriptions()
+    rows, seen = [], {}
+    for line in run("omarchy-menu-keybindings", "--print").splitlines():
+        if " → " not in line:
+            continue
+        keys, desc = (part.strip() for part in line.split(" → ", 1))
+        if desc in DROP:
+            continue
+        desc = RENAME.get(full.get(desc, desc), full.get(desc, desc))
+        keys = chord(keys)
+        if desc == "Switch keyboard layout (en/ru)":
+            keys = "ALT + SHIFT (tap)"
+        if desc == "Dictation (hold to talk)":
+            keys = "RIGHT ALT (hold)"
+        if desc in seen:  # same job on another chord: one row, "A / B"
+            row = rows[seen[desc]]
+            parts = row[0].split(" / ")
+            if keys not in parts:
+                row[0] = " / ".join(sorted(parts + [keys], key=chord_order))
+            continue
+        seen[desc] = len(rows)
+        rows.append([keys, desc])
+    rows = fold_numbered(rows)
+    # A merged row too long for the arrow column goes back to one row per chord
+    split = []
+    for keys, desc in rows:
+        if len(keys) > 32 and " / " in keys:  # keep 3+ spaces before the arrow
+            split += [[k, desc] for k in keys.split(" / ")]
+        else:
+            split.append([keys, desc])
+    rows = split
+    # SUPER + COMMA sits with the other notification chords
+    lone = next((r for r in rows if r[0] == "SUPER + ,"), None)
+    if lone:
+        rows.remove(lone)
+        at = next((i for i, r in enumerate(rows) if r[0].endswith(" + ,")), len(rows))
+        rows.insert(at, lone)
+    for first, second in PAIRS:
+        pair = [r for r in rows if r[1] == first] + [r for r in rows if r[1] == second]
+        if len(pair) < 2:
+            continue
+        at = min(rows.index(r) for r in pair)
+        rows = [r for r in rows if r not in pair]
+        rows[at:at] = pair
+    media_rank = {desc: i for i, desc in enumerate(MEDIA)}
+    media = [r for r in rows if r[1] in media_rank]
+    if media:
+        at = rows.index(media[0])
+        rows = [r for r in rows if r[1] not in media_rank]
+        rows[at:at] = sorted(media, key=lambda r: media_rank[r[1]])  # stable: split pairs stay in order
+    rank = {desc: i for i, desc in enumerate(FIRST)}
+    head, rest = rows[:1], rows[1:]
+    grammar = sorted((r for r in rest if r[1] in rank), key=lambda r: rank[r[1]])
+    rest = [r for r in rest if r[1] not in rank]
+    # Touchpad gestures are not binds, so hyprctl never lists them: they sit
+    # with the focus rows they mirror (bindings.lua / input.lua)
+    at = next((i + 1 for i, r in enumerate(grammar) if r[1] == "Focus up (or workspace)"), len(grammar))
+    grammar[at:at] = [
+        ["3-FINGER SWIPE LEFT / RIGHT", "Focus column left / right (touchpad)"],
+        ["3-FINGER SWIPE UP / DOWN", "Switch workspace (touchpad)"],
+    ]
+    return [f"{k:<35} → {d}" for k, d in head + grammar + rest]
+
+
+lines = records()
+if len(sys.argv) > 1 and sys.argv[1] in ("--print", "-p"):
+    print("\n".join(lines))
+    sys.exit(0)
+
+title = run("omarchy-i18n", "keybindings.title").strip() or "Keybindings"
+subprocess.run(["omarchy-menu-select", title, "--", "--width", "960", "--height", "500"],
+               input="\n".join(lines) + "\n", text=True, env=env, stdout=subprocess.DEVNULL)

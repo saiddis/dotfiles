@@ -1,0 +1,224 @@
+#!/usr/bin/env python3
+"""Notify when something connects to this machine.
+
+- Bluetooth: a device connecting or disconnecting (BlueZ, system D-Bus),
+  with its battery level when it reports one.
+- USB: a device plugged in or removed (udev). Built-in devices (webcam,
+  Bluetooth radio, hubs) report themselves as "fixed" and are skipped.
+
+Runs as the user service device-notify.service. Notifications go through
+`omarchy notification send`, so they look like the rest of the desktop.
+Devices that re-attach while waking from suspend stay quiet for a few
+seconds after resume.
+"""
+
+import os
+import subprocess
+import sys
+import time
+
+import gi
+
+gi.require_version("Gio", "2.0")
+from gi.repository import Gio, GLib  # noqa: E402
+
+try:  # GLib 2.80+
+    gi.require_version("GLibUnix", "2.0")
+    from gi.repository import GLibUnix  # noqa: E402
+
+    fd_add = GLibUnix.fd_add_full
+except (ImportError, ValueError):
+    fd_add = GLib.unix_fd_add_full
+
+QUIET_AFTER_RESUME = 8  # seconds
+quiet_until = time.monotonic() + 3  # and right after start (login)
+
+BT_GLYPHS = {
+    "audio-headset": "󰋋",
+    "audio-headphones": "󰋋",
+    "audio-card": "󰓃",
+    "input-keyboard": "󰌌",
+    "input-mouse": "󰍽",
+    "input-gaming": "󰊴",
+    "input-tablet": "󰓶",
+    "phone": "󰄜",
+    "computer": "󰍹",
+}
+
+
+def notify(headline, body, glyph):
+    if time.monotonic() < quiet_until:
+        return
+    subprocess.Popen(
+        ["omarchy-notification-send", "--app-name", "Devices", "-g", glyph, headline, body],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+
+# ── Bluetooth ────────────────────────────────────────────────────────────────
+
+system = Gio.bus_get_sync(Gio.BusType.SYSTEM, None)
+
+
+def bt_props(path, interface):
+    try:
+        reply = system.call_sync(
+            "org.bluez", path, "org.freedesktop.DBus.Properties", "GetAll",
+            GLib.Variant("(s)", (interface,)), GLib.VariantType("(a{sv})"),
+            Gio.DBusCallFlags.NONE, 2000, None,
+        )
+        return reply.unpack()[0]
+    except GLib.Error:
+        return {}
+
+
+bt_pending = {}  # device path -> timeout of a connect notice not yet shown
+
+
+def bt_changed(_conn, _sender, path, _iface, _signal, params, _data):
+    interface, changed, _invalidated = params.unpack()
+    if interface != "org.bluez.Device1" or "Connected" not in changed:
+        return
+    dev = bt_props(path, "org.bluez.Device1")
+    name = dev.get("Alias") or dev.get("Name") or dev.get("Address", "Bluetooth device")
+    glyph = BT_GLYPHS.get(dev.get("Icon", ""), "󰂱")
+    pending = bt_pending.pop(path, None)
+    if pending:  # a connect still waiting for its battery level
+        GLib.source_remove(pending)
+    if changed["Connected"]:
+        # The battery level is often published a moment after connecting
+        def announce():
+            bt_pending.pop(path, None)
+            level = bt_props(path, "org.bluez.Battery1").get("Percentage")
+            body = f"{name} · {level}% battery" if level is not None else name
+            notify("Bluetooth connected", body, glyph)
+            return False
+
+        bt_pending[path] = GLib.timeout_add(1500, announce)
+    else:
+        notify("Bluetooth disconnected", name, "󰂲")
+
+
+system.signal_subscribe(
+    "org.bluez", "org.freedesktop.DBus.Properties", "PropertiesChanged",
+    None, "org.bluez.Device1", Gio.DBusSignalFlags.NONE, bt_changed, None,
+)
+
+
+def sleeping(_conn, _sender, _path, _iface, _signal, params, _data):
+    global quiet_until
+    going_down = params.unpack()[0]
+    if not going_down:  # resumed
+        quiet_until = time.monotonic() + QUIET_AFTER_RESUME
+    else:
+        quiet_until = float("inf")
+
+
+system.signal_subscribe(
+    "org.freedesktop.login1", "org.freedesktop.login1.Manager", "PrepareForSleep",
+    "/org/freedesktop/login1", None, Gio.DBusSignalFlags.NONE, sleeping, None,
+)
+
+
+# ── USB ──────────────────────────────────────────────────────────────────────
+
+usb_names = {}  # devpath -> name, for devices worth announcing
+
+
+def sysfs(devpath, attr):
+    try:
+        with open(f"/sys{devpath}/{attr}") as f:
+            return f.read().strip()
+    except OSError:
+        return ""
+
+
+def trim_company(name):
+    """"Logitech, Inc." -> "Logitech"."""
+    for suffix in (", Inc.", " Inc.", ", Ltd", " Ltd.", " Ltd", " Co.", ", Corp.", " Corp.",
+                   " Corporation", " Technology", " Technologies"):
+        if name.endswith(suffix):
+            name = name[: -len(suffix)]
+    return name.rstrip(" ,")
+
+
+def usb_name(props):
+    model = props.get("ID_MODEL_FROM_DATABASE") or props.get("ID_MODEL", "").replace("_", " ")
+    vendor = trim_company(props.get("ID_VENDOR_FROM_DATABASE") or props.get("ID_VENDOR", "").replace("_", " "))
+    if model and vendor and not model.lower().startswith(vendor.split()[0].lower()):
+        return f"{vendor} {model}"
+    return model or vendor or "USB device"
+
+
+def worth_announcing(props):
+    if props.get("DEVTYPE") != "usb_device":
+        return False
+    if ":09" in props.get("ID_USB_INTERFACES", ""):  # hubs
+        return False
+    return sysfs(props["DEVPATH"], "removable") != "fixed"
+
+
+# Devices already plugged in when the service starts, so their removal is named
+for entry in os.listdir("/sys/bus/usb/devices"):
+    path = os.path.realpath(f"/sys/bus/usb/devices/{entry}")
+    devpath = path[len("/sys"):]
+    try:
+        out = subprocess.run(["udevadm", "info", "--query=property", f"--path={devpath}"],
+                             capture_output=True, text=True, timeout=5).stdout
+    except (OSError, subprocess.TimeoutExpired):
+        continue
+    props = dict(line.split("=", 1) for line in out.splitlines() if "=" in line)
+    props.setdefault("DEVPATH", devpath)
+    if worth_announcing(props):
+        usb_names[devpath] = usb_name(props)
+
+monitor = subprocess.Popen(
+    ["udevadm", "monitor", "--udev", "--subsystem-match=usb", "--property"],
+    stdout=subprocess.PIPE,
+)
+os.set_blocking(monitor.stdout.fileno(), False)
+pending = b""  # bytes of an event not complete yet
+
+
+def usb_event(props):
+    action, devpath = props.get("ACTION"), props.get("DEVPATH", "")
+    if action == "add" and worth_announcing(props):
+        usb_names[devpath] = usb_name(props)
+        notify("USB device connected", usb_names[devpath], "󰕓")
+    elif action == "remove" and devpath in usb_names:
+        notify("USB device removed", usb_names.pop(devpath), "󰕓")
+
+
+def usb_ready(fd, _cond):
+    # Read everything the pipe holds and handle every complete event in it:
+    # one event per wake-up would leave the rest waiting until the next one.
+    global pending, exit_code
+    ended = False
+    while True:
+        try:
+            chunk = os.read(fd, 65536)
+        except BlockingIOError:
+            break
+        if not chunk:
+            ended = True
+            break
+        pending += chunk
+    *events, pending = pending.split(b"\n\n")
+    for event in events:
+        props = dict(line.split("=", 1) for line in event.decode(errors="replace").splitlines() if "=" in line)
+        if props:
+            usb_event(props)
+    if ended:  # udevadm exited: fail, so systemd restarts the service
+        exit_code = 1
+        loop.quit()
+        return False
+    return True
+
+
+exit_code = 0
+fd_add(GLib.PRIORITY_DEFAULT, monitor.stdout.fileno(), GLib.IO_IN | GLib.IO_HUP, usb_ready)
+
+loop = GLib.MainLoop()
+loop.run()
+sys.exit(exit_code)

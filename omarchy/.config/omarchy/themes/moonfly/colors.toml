@@ -1,0 +1,61 @@
+# Moonfly for Omarchy: the moonfly palette (vim-moonfly-colors by bluz71,
+# https://github.com/bluz71/vim-moonfly-colors, MIT) and its terminal extras,
+# for everything Omarchy themes.
+#
+# Look: flat and quiet, like moonfly in Neovim. Near-black canvas, neutral
+# greys, one accent (moonfly blue) that marks focus and selection, moonfly's
+# own colours for states.
+#
+# The author's copy also keeps its own neovim.lua, hyprland.lua and terminal
+# configs (which a theme installed from git can't ship); after editing a
+# colour there, run `python3 sync-overrides.py` in the theme folder.
+mode = "dark"
+
+accent = "#80A0FF"               # moonfly blue
+
+# Window borders: the focused window wears the accent, the rest a hairline
+# grey, so focus reads at a glance on the scrolling layout.
+hyprland_active_border = "rgba(80a0ffe6)"
+hyprland_inactive_border = "rgba(2e2e2eff)"
+
+selection = "#323437"            # moonfly grey0 (selected rows)
+selection_background = "#B2CEEE" # moonfly terminal selection
+selection_foreground = "#080808"
+muted = "#949494"                # moonfly grey58
+
+# Surfaces, darkest to lightest:
+#   background          #080808  canvas: terminal, editor, pages
+#   darker_background   #080808
+#   dark_background     #121212  sidebars
+#   float_background    #1C1C1C  popups, menus, cards (extra key)
+#   lighter_background  #262626  active rows
+#   overlay_background  #262626  menus over floating surfaces (extra key)
+#   surface_border      #2E2E2E  hairline edges (extra key)
+background = "#080808"
+darker_background = "#080808"
+dark_background = "#121212"
+float_background = "#1C1C1C"
+lighter_background = "#262626"
+overlay_background = "#262626"
+surface_border = "#2E2E2E"
+
+foreground = "#BDBDBD"           # moonfly terminal foreground
+dark_foreground = "#626262"      # moonfly grey39
+light_foreground = "#B2B2B2"     # moonfly grey70
+bright_foreground = "#E4E4E4"    # moonfly grey89
+
+red = "#FF5D5D"                  # moonfly red
+yellow = "#E3C78A"               # moonfly yellow
+orange = "#DE935F"               # moonfly orange
+green = "#8CC85F"                # moonfly green
+cyan = "#79DAC8"                 # moonfly turquoise
+blue = "#80A0FF"                 # moonfly blue
+magenta = "#CF87E8"              # moonfly violet
+brown = "#7A4E2D"
+
+bright_red = "#FF5189"           # moonfly crimson
+bright_yellow = "#C6C684"        # moonfly khaki
+bright_green = "#36C692"         # moonfly emerald
+bright_cyan = "#85DC85"          # moonfly lime
+bright_blue = "#74B2FF"          # moonfly sky
+bright_magenta = "#AE81FF"       # moonfly purple

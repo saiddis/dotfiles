@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Copies the Moonfly theme as I use it (omarchy/.config/omarchy/themes/moonfly)
+# into a checkout of the published theme, omarchy-moonfly-theme:
+#
+#   setup/export-moonfly ~/Projects/omarchy-moonfly-theme
+#
+# Only what a theme installed with `omarchy theme install` gets to keep:
+# Omarchy drops every .lua and the terminal configs from such a theme and
+# makes them from colors.toml instead, so neovim.lua, hyprland.lua,
+# ghostty.conf, alacritty.toml, kitty.conf and foot.ini (and the scripts that
+# make them) stay here. icons.theme stays too: WhiteSur isn't on a stock
+# Omarchy, so the published theme keeps Omarchy's Yaru icons.
+#
+# The published repo's own README.md, LICENSE, preview.png (a screenshot of
+# the published version) and neovim.lua (stock moonfly, not my modified
+# palette; Omarchy uses it only for a copy without .git) are left alone.
+# Commit there by hand.
+set -euo pipefail
+
+DOTFILES=$(cd "$(dirname "$0")/.." && pwd)
+SOURCE="$DOTFILES/omarchy/.config/omarchy/themes/moonfly"
+DEST=${1:?usage: $0 <checkout of omarchy-moonfly-theme>}
+
+FILES=(colors.toml shell.toml t3code.json unlock.png preview-unlock.png)
+
+[[ -d $DEST/.git ]] || { echo "$DEST isn't a git checkout" >&2; exit 1; }
+
+for file in "${FILES[@]}"; do
+  cp "$SOURCE/$file" "$DEST/$file"
+done
+rm -rf "$DEST/backgrounds"
+cp -r "$SOURCE/backgrounds" "$DEST/backgrounds"
+
+git -C "$DEST" status --short

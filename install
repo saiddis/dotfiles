@@ -1,0 +1,208 @@
+#!/usr/bin/env bash
+# Puts this setup on an Omarchy machine. Safe to run again: whatever is
+# already in place is left alone.
+#
+#   ./install            do it
+#   ./install --dry-run  only print what it would do
+#
+# 1. packages from setup/packages.txt (sudo, once)
+# 2. links into this repo with GNU stow (setup/layout.sh); a config already
+#    in the way moves to ~/.local/state/dotfiles/backup/<time>/ first
+# 3. other people's Omarchy plugins and themes (setup/omarchy-*.txt)
+# 4. the device-notify user service
+# 5. Neovim plugins at the versions in nvim/.config/nvim/lazy-lock.json
+# 6. the Moonfly theme, then Hyprland and the Omarchy shell reload
+#
+# Not done here, needs root: evremap's keyboard remaps (evremap/install-systemd.sh).
+set -euo pipefail
+shopt -s nullglob  # a missing ~/tstack lists no skills, not a literal *
+
+DOTFILES=$(cd "$(dirname "$0")" && pwd)
+source "$DOTFILES/setup/layout.sh"
+
+DRY=0
+case ${1:-} in
+  -n | --dry-run) DRY=1 ;;
+  "") ;;
+  *) echo "usage: $0 [--dry-run]" >&2; exit 2 ;;
+esac
+
+BACKUP="$HOME/.local/state/dotfiles/backup/$(date +%Y%m%d-%H%M%S)"
+LINKED_OMARCHY=0
+LINKED_ANY=0
+
+say() { printf '\e[1m%s\e[0m\n' "$*"; }
+run() {
+  printf '  %s\n' "$*"
+  (( DRY )) || "$@"
+}
+# setup/*.txt without comments and blank lines
+entries() { sed -e 's/#.*//' -e '/^[[:space:]]*$/d' "$DOTFILES/setup/$1"; }
+
+if ! command -v omarchy >/dev/null; then
+  echo "This setup is for Omarchy (https://omarchy.org); omarchy isn't installed." >&2
+  exit 1
+fi
+
+say "Packages"
+repo=() aur=()
+while read -r pkg; do
+  if [[ $pkg == aur:* ]]; then
+    pacman -Qq "${pkg#aur:}" >/dev/null 2>&1 || aur+=("${pkg#aur:}")
+  else
+    pacman -Qq "$pkg" >/dev/null 2>&1 || repo+=("$pkg")
+  fi
+done < <(entries packages.txt | awk '{print $1}')
+# A failed install (no sudo password, say) is reported, not fatal: the
+# links still matter
+if (( ${#repo[@]} )); then
+  run omarchy pkg add "${repo[@]}" || echo "  couldn't install ${repo[*]}; rerun from a terminal"
+fi
+if (( ${#aur[@]} )); then
+  run omarchy pkg aur add "${aur[@]}" || echo "  couldn't install ${aur[*]}; rerun from a terminal"
+fi
+(( ${#repo[@]} + ${#aur[@]} )) || echo "  all there"
+
+# Moves a path out of the way, keeping its place under $HOME in the backup
+backup() {
+  local path=$1 rel=${1#"$HOME"/}
+  run mkdir -p "$(dirname "$BACKUP/$rel")"
+  run mv "$path" "$BACKUP/$rel"
+}
+
+# Whether $1 is a link that ends up at $2
+links_to() {
+  [[ -L $1 ]] && [[ $(readlink -f "$1") == "$(readlink -f "$2")" ]]
+}
+
+say "Links"
+# Checked before anything is moved aside: without stow, the configs would
+# be backed up and nothing linked in their place
+if ! command -v stow >/dev/null && (( ! DRY )); then
+  echo "  stow isn't installed (the package step failed?); nothing moved" >&2
+  exit 1
+fi
+for pkg in "${PACKAGES[@]}"; do
+  need=0
+  if [[ " ${FOLDED[*]} " == *" $pkg "* ]]; then
+    # One link for the whole ~/.config/<pkg> folder
+    target="$HOME/.config/$pkg"
+    links_to "$target" "$DOTFILES/$pkg/.config/$pkg" && continue
+    [[ -e $target || -L $target ]] && backup "$target"
+    need=1
+  else
+    # A link per file: move aside each file that isn't ours
+    while IFS= read -r -d '' file; do
+      rel=${file#"$DOTFILES/$pkg/"}
+      target="$HOME/$rel"
+      # Inside a folder an older stow run linked whole: restow below
+      # unfolds it; moving the file would move the repo's own copy
+      if [[ $(readlink -f "$(dirname "$target")") == "$DOTFILES"/* ]]; then
+        need=1
+        continue
+      fi
+      links_to "$target" "$file" && continue
+      need=1
+      [[ -e $target || -L $target ]] && backup "$target"
+    done < <(find "$DOTFILES/$pkg" \( -type f -o -type l \) -not -name '.stow-local-ignore' -print0)
+  fi
+  (( need )) || continue
+  # Other packages link file by file even where the folder doesn't exist
+  # yet: a missing ~/.claude or ~/.config/herdr must not become a link that
+  # drops credentials, logs and sockets into this repo
+  if [[ " ${FOLDED[*]} " == *" $pkg "* ]]; then
+    run stow --dir "$DOTFILES" --target "$HOME" --restow "$pkg"
+  else
+    run stow --dir "$DOTFILES" --target "$HOME" --restow --no-folding "$pkg"
+  fi
+  LINKED_ANY=1
+  [[ $pkg == omarchy ]] && LINKED_OMARCHY=1
+done
+(( LINKED_ANY )) || echo "  all linked"
+
+if ! links_to "$NVIM_THEME_LINK" "$NVIM_THEME_TARGET"; then
+  # Omarchy's own link is relative, which breaks once ~/.config/nvim is a
+  # link into this repo; this one is absolute
+  [[ -e $NVIM_THEME_LINK && ! -L $NVIM_THEME_LINK ]] && backup "$NVIM_THEME_LINK"
+  run ln -sfn "$NVIM_THEME_TARGET" "$NVIM_THEME_LINK"
+fi
+
+say "Omarchy plugins and themes"
+plugins="$HOME/.config/omarchy/plugins"
+while read -r id source; do
+  [[ -e $plugins/$id || -L $plugins/$id ]] && continue
+  if [[ $source == /* ]]; then
+    [[ -e $source ]] && run ln -s "$source" "$plugins/$id" || echo "  skipped $id: $source isn't installed"
+  else
+    run omarchy plugin add "$source" --yes
+  fi
+done < <(entries omarchy-plugins.txt)
+# oma-cast's command on PATH (hypr/omacast.lua calls it)
+if [[ -x $plugins/typecraft.omacast/bin/omacast && ! -e $HOME/.local/bin/omacast ]]; then
+  run mkdir -p "$HOME/.local/bin"
+  run ln -s "$plugins/typecraft.omacast/bin/omacast" "$HOME/.local/bin/omacast"
+fi
+# Local changes to other people's plugins, kept as patches (setup/patches)
+for patch in "$DOTFILES"/setup/patches/*.patch; do
+  dir="$plugins/$(basename "$patch" .patch)"
+  [[ -d $dir ]] || continue
+  git -C "$dir" --git-dir=.git apply --reverse --check "$patch" 2>/dev/null && continue
+  if git -C "$dir" --git-dir=.git apply --check "$patch" 2>/dev/null; then
+    run git -C "$dir" --git-dir=.git apply "$patch"
+  else
+    echo "  ${patch##*/} doesn't apply to ${dir##*/} (updated upstream?); see the patch's header"
+  fi
+done
+themes="$HOME/.config/omarchy/themes"
+while read -r name url; do
+  [[ -e $themes/$name ]] || run git clone --quiet -- "$url" "$themes/$name"
+done < <(entries omarchy-themes.txt)
+
+say "Agent skills (tstack)"
+[[ -d $TSTACK_DIR ]] || run git clone --quiet -- "$TSTACK_URL" "$TSTACK_DIR"
+run mkdir -p "$SKILL_HUB" "$CLAUDE_SKILLS"
+# Puts link $1 -> $2 in place, moving aside whatever else is there (a copy
+# from tstack's README install)
+place() {
+  links_to "$1" "$2" && [[ $(readlink "$1") == "$2" ]] && return
+  [[ -e $1 || -L $1 ]] && backup "$1"
+  run ln -s "$2" "$1"
+}
+for skill in "$TSTACK_DIR"/skills/*/; do
+  name=$(basename "$skill")
+  place "$SKILL_HUB/$name" "${skill%/}"
+  place "$CLAUDE_SKILLS/$name" "$SKILL_HUB/$name"
+  # Codex finds it in ~/.agents/skills; a second copy would list it twice
+  [[ -e $CODEX_SKILLS/$name || -L $CODEX_SKILLS/$name ]] && backup "$CODEX_SKILLS/$name"
+done
+
+say "Services"
+if [[ $(systemctl --user is-enabled device-notify.service 2>/dev/null) != enabled ]]; then
+  run systemctl --user daemon-reload
+  run systemctl --user enable --now device-notify.service
+else
+  echo "  device-notify on"
+fi
+
+say "Neovim plugins (lazy-lock.json)"
+if command -v nvim >/dev/null; then
+  run nvim --headless "+Lazy! restore" +qa
+fi
+
+say "Theme"
+if [[ $(omarchy theme current 2>/dev/null) != Moonfly ]]; then
+  run omarchy theme set moonfly
+else
+  echo "  Moonfly"
+fi
+if (( LINKED_ANY )) && [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+  run hyprctl reload
+  (( LINKED_OMARCHY )) && run omarchy restart shell
+fi
+
+if [[ -d $BACKUP ]]; then
+  say "What was in the way is in $BACKUP"
+fi
+say "Left to do by hand"
+echo "  keyboard remaps (root): $DOTFILES/evremap/install-systemd.sh"
+echo "  check:                  $DOTFILES/doctor"

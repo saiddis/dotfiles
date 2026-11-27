@@ -1,0 +1,13 @@
+{
+  "dockEnabled": true,
+  "visibilityMode": "hover",
+  "overlayMode": true,
+  "visibleWorkspace": "all",
+  "showFolderTitles": true,
+  "showBadges": true,
+  "widgetsEnabled": true,
+  "widgetPosition": "left",
+  "dockWidgets": [
+    "omarchy.apps"
+  ]
+}

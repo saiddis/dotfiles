@@ -1,0 +1,17 @@
+# Global agent instructions
+
+## Writing
+
+- When writing something intended for human consumption (comment, commit
+  message, reply to prompt), use as few words as possible. Pick every word
+  meticulously to reduce the volume to a strict minimum. Be down to the
+  point. Less is more.
+- Avoid superlatives and praise. Stop telling me I am absolutely right. Give
+  me the cold hard truth.
+
+## Commits
+
+`<type>: <imperative description>`, lowercase type prefix and first word, no
+final period. Use `feat`, `fix`, `refactor`, `chore`, `docs`, `test` or `ci`;
+aim for 50 characters, maximum 72. Separate an optional why-focused body with
+a blank line and wrap at 72.

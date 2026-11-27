@@ -1,0 +1,8 @@
+# Other people's Omarchy shell plugins, as "<id> <git url>". ./install adds
+# the missing ones with `omarchy plugin add` (which clones and validates
+# them); whether each is on, and where, is already in shell.json. A path in
+# place of a URL is linked instead (a plugin another package ships).
+expose.window-overview   https://github.com/kristofferR/omarchy-expose.git
+tornikegomareli.spaces   https://github.com/tornikegomareli/omarchy-spaces.git
+typecraft.omacast        https://github.com/typecraft-dev/oma-cast.git
+superwhisper-panel       /opt/superwhisper/assets/omarchy-plugin/superwhisper-panel

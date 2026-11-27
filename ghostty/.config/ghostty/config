@@ -1,23 +1,73 @@
-theme = Paul Millr
+# Dynamic theme colors
+config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"
 
-font-family = JetBrainsMono Nerd Font
+# Font
+font-family = "JetBrainsMono Nerd Font"
+font-style = Regular
+font-size = 11
+# Box-drawing lines 1px thicker: Neovim's current-window border (colorful-winsep),
+# herdr's pane frames and every other drawn line
+adjust-box-thickness = 1
 
-font-size = 13.0
-gtk-titlebar = false
-cursor-color = #25FF5F
-mouse-hide-while-typing = true
-# gtk-tabs-location = hidden
-window-decoration = true
+# A bell (Esc Esc at a prompt, an agent finishing in a herdr pane) marks the
+# title with a bell but does not ask for attention: Hyprland activates any
+# window that asks (focus_on_activate), which pulled focus and switched
+# workspace from a background terminal
+bell-features = no-attention
 
-keybind = alt=toggle_secure_input
-keybind = ctrl+t=new_tab
-# keybind = alt+p=previous_tab
-# keybind = alt+n=next_tab
+# Window
+window-theme = ghostty
+# Breathing room so text never touches the window border; balance centres
+# the cell grid so the leftover space is spread evenly on all sides.
+window-padding-x = 10
+window-padding-y = 6
+window-padding-balance = true
+confirm-close-surface=false
+resize-overlay = never
+gtk-toolbar-style = flat
 
-keybind = ctrl+w=close_tab:this
+# Cursor styling
+cursor-style = "block"
+cursor-style-blink = false
 
-# keybind = alt+w=new_split:auto
-# keybind = ctrl+shift+h=goto_split:left
-# keybind = ctrl+shift+j=goto_split:bottom
-# keybind = ctrl+shift+k=goto_split:top
-# keybind = ctrl+shift+l=goto_split:right
+# Cursor styling + SSH session terminfo
+# (all shell integration options must be passed together)
+shell-integration-features = no-cursor,ssh-env
+
+# Keyboard bindings
+keybind = shift+insert=paste_from_clipboard
+keybind = control+insert=copy_to_clipboard
+# Send Shift+Enter as CSI-u so TUIs can distinguish it from Enter.
+keybind = shift+enter=csi:13;2u
+# Legacy encoding sends Alt+Shift+Enter the same as Alt+Enter; send CSI-u so tmux can match M-S-Enter.
+keybind = alt+shift+enter=csi:13;4u
+keybind = super+control+shift+alt+arrow_down=resize_split:down,100
+keybind = super+control+shift+alt+arrow_up=resize_split:up,100
+keybind = super+control+shift+alt+arrow_left=resize_split:left,100
+keybind = super+control+shift+alt+arrow_right=resize_split:right,100
+
+# Slowdown mouse scrolling
+mouse-scroll-multiplier = 0.95
+
+# Fix general slowness on hyprland (https://github.com/ghostty-org/ghostty/discussions/3224)
+async-backend = epoll
+
+# Alt+1..9 belong to herdr (tab 1..9); Ghostty's goto_tab would take them
+# as soon as a Ghostty tab exists
+keybind = alt+1=unbind
+keybind = alt+2=unbind
+keybind = alt+3=unbind
+keybind = alt+4=unbind
+keybind = alt+5=unbind
+keybind = alt+6=unbind
+keybind = alt+7=unbind
+keybind = alt+8=unbind
+keybind = alt+9=unbind
+
+# Ctrl+Shift+j and Ctrl+Alt+Shift+j belong to herdr (swap pane down and
+# resize split down, next to Ctrl+j focus down). Ghostty's defaults wrote the
+# scrollback to a file and pasted its path, or opened it in a hidden editor.
+# These were the only Ghostty defaults on herdr's chords
+# (ghostty +list-keybinds --default).
+keybind = ctrl+shift+j=unbind
+keybind = ctrl+alt+shift+j=unbind

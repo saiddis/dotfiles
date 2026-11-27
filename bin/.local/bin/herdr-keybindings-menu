@@ -1,0 +1,82 @@
+#!/bin/bash
+# SUPER + CTRL + K: Omarchy's herdr cheat sheet, plus what it leaves out.
+# omarchy-menu-herdr-keybindings reads [keys] only, so the [[keys.command]]
+# binds (herdr-splits Ctrl + hjkl, the navigator, passthrough keys) were
+# missing, and shifted symbols showed as SHIFT + BACKSLASH and so on.
+# Usage: herdr-keybindings-menu [--print]
+
+config="${HERDR_CONFIG_PATH:-${XDG_CONFIG_HOME:-$HOME/.config}/herdr/config.toml}"
+
+symbols() {
+  sed -E \
+    -e 's/SHIFT \+ BACKSLASH/|/g' -e 's/SHIFT \+ MINUS/_/g' -e 's/SHIFT \+ SLASH/?/g' \
+    -e 's/SHIFT \+ COMMA/</g' -e 's/SHIFT \+ PERIOD/>/g' \
+    -e 's/ \+ COMMA( |$)/ + ,\1/g' -e 's/ \+ PERIOD( |$)/ + .\1/g' -e 's/ \+ MINUS( |$)/ + -\1/g' \
+    -e 's/→ Resize mode$/→ Resize mode (hjkl, Esc leaves)/' \
+    -e 's/→ Copy mode$/→ Copy mode (vi keys, v select, y copy)/' \
+    -e 's/→ Remote image paste$/→ Image paste (remote sessions only)/'
+}
+
+# "key = ..." and "description = ..." from each [[keys.command]] block
+commands() {
+  awk '
+    function flush() { if (key != "") printf "%-32s → %s\n", key, (desc != "" ? desc : "Custom command"); key = ""; desc = "" }
+    function value(line) { sub(/^[^=]*=[[:space:]]*/, "", line); gsub(/^["'\'']|["'\''][[:space:]]*$/, "", line); return line }
+    /^\[\[keys\.command\]\]/ { flush(); in_cmd = 1; next }
+    /^\[/ { flush(); in_cmd = 0; next }
+    in_cmd && /^[[:space:]]*key[[:space:]]*=/ {
+      k = value($0); n = split(k, parts, "+"); key = ""
+      for (i = 1; i <= n; i++) key = key (key == "" ? "" : " + ") toupper(parts[i])
+    }
+    in_cmd && /^[[:space:]]*description[[:space:]]*=/ { desc = value($0) }
+    END { flush() }
+  ' "$config"
+}
+
+# Custom commands (the everyday Ctrl + hjkl ones) right after the prefix line,
+# then symbols for shifted keys, re-padded to the same arrow column as the
+# SUPER + K sheet (keybindings-menu). Navigate-mode rows are left out: they are
+# the same hjkl that PREFIX + H/J/K/L lists.
+records() {
+  local defaults
+  defaults=$(omarchy-menu-herdr-keybindings --print --config "$config")
+  {
+    printf '%s\n' "$defaults" | head -n 1
+    commands
+    printf '%s\n' "$defaults" | tail -n +2
+  } | symbols | grep -v '^NAVIGATE + ' |
+    awk -F ' → ' '{
+      k = $1; sub(/[[:space:]]+$/, "", k)
+      # a merged row too long for the arrow column: one row per chord
+      if (length(k) > 32 && index(k, " / ")) {  # keep 3+ spaces before the arrow
+        n = split(k, parts, " / ")
+        for (i = 1; i <= n; i++) printf "%-35s → %s\n", parts[i], $2
+      } else printf "%-35s → %s\n", k, $2
+    }' | pair_shell_keys
+}
+
+# PREFIX + CTRL + L (clear) and PREFIX + CTRL + K (kill line) are the two shell
+# keys moved behind the prefix because Ctrl + hjkl moves between splits: list
+# them together, right after the Ctrl + hjkl rows.
+pair_shell_keys() {
+  awk '
+    { line[NR] = $0 }
+    /^PREFIX \+ CTRL \+ L / { clear = NR }
+    /^PREFIX \+ CTRL \+ K / { kill = NR }
+    END {
+      for (i = 1; i <= NR; i++) {
+        if (i == clear && kill) continue
+        print line[i]
+        if (i == kill && clear) print line[clear]
+      }
+    }'
+}
+
+if [[ $1 == "--print" || $1 == "-p" ]]; then
+  records
+  exit 0
+fi
+
+height=$(hyprctl monitors -j 2>/dev/null | jq -r '.[] | select(.focused == true) | .height' 2>/dev/null)
+[[ $height =~ ^[0-9]+$ ]] && ((height > 0)) || height=900
+records | omarchy-menu-select "$(omarchy-i18n keybindings.herdrTitle)" -- --width 960 --height $((height * 40 / 100)) >/dev/null || true
