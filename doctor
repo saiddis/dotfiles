@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2088  # ~ in messages is text for the reader
 # Checks that this setup is still in place: every config a link into this
 # repo, Omarchy's Neovim theme link, the listed plugins and themes, the
 # device-notify service, Hyprland's config free of errors. Then shows what
@@ -6,6 +7,7 @@
 # lands there, since the folders are linked). Changes nothing; ./install
 # fixes what it reports.
 set -uo pipefail
+shopt -s nullglob
 
 DOTFILES=$(cd "$(dirname "$0")" && pwd)
 source "$DOTFILES/setup/layout.sh"

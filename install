@@ -15,6 +15,7 @@
 #
 # Not done here, needs root: evremap's keyboard remaps (evremap/install-systemd.sh).
 set -euo pipefail
+shopt -s nullglob  # a missing ~/tstack lists no skills, not a literal *
 
 DOTFILES=$(cd "$(dirname "$0")" && pwd)
 source "$DOTFILES/setup/layout.sh"
@@ -94,7 +95,14 @@ for pkg in "${PACKAGES[@]}"; do
     done < <(find "$DOTFILES/$pkg" \( -type f -o -type l \) -not -name '.stow-local-ignore' -print0)
   fi
   (( need )) || continue
-  run stow --dir "$DOTFILES" --target "$HOME" --restow "$pkg"
+  # Other packages link file by file even where the folder doesn't exist
+  # yet: a missing ~/.claude or ~/.config/herdr must not become a link that
+  # drops credentials, logs and sockets into this repo
+  if [[ " ${FOLDED[*]} " == *" $pkg "* ]]; then
+    run stow --dir "$DOTFILES" --target "$HOME" --restow "$pkg"
+  else
+    run stow --dir "$DOTFILES" --target "$HOME" --restow --no-folding "$pkg"
+  fi
   LINKED_ANY=1
   [[ $pkg == omarchy ]] && LINKED_OMARCHY=1
 done
