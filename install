@@ -146,9 +146,9 @@ fi
 for patch in "$DOTFILES"/setup/patches/*.patch; do
   dir="$plugins/$(basename "$patch" .patch)"
   [[ -d $dir ]] || continue
-  git -C "$dir" apply --reverse --check "$patch" 2>/dev/null && continue
-  if git -C "$dir" apply --check "$patch" 2>/dev/null; then
-    run git -C "$dir" apply "$patch"
+  git -C "$dir" --git-dir=.git apply --reverse --check "$patch" 2>/dev/null && continue
+  if git -C "$dir" --git-dir=.git apply --check "$patch" 2>/dev/null; then
+    run git -C "$dir" --git-dir=.git apply "$patch"
   else
     echo "  ${patch##*/} doesn't apply to ${dir##*/} (updated upstream?); see the patch's header"
   fi

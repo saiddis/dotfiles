@@ -41,7 +41,7 @@ while read -r id _; do
 done < <(entries omarchy-plugins.txt)
 for patch in "$DOTFILES"/setup/patches/*.patch; do
   dir="$HOME/.config/omarchy/plugins/$(basename "$patch" .patch)"
-  [[ -d $dir ]] && ! git -C "$dir" apply --reverse --check "$patch" 2>/dev/null &&
+  [[ -d $dir ]] && ! git -C "$dir" --git-dir=.git apply --reverse --check "$patch" 2>/dev/null &&
     bad "${patch##*/} isn't applied to ${dir##*/}"
 done
 while read -r name _; do

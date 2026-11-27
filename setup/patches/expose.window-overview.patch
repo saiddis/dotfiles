@@ -1,11 +1,12 @@
 Local changes to expose.window-overview (github.com/kristofferR/omarchy-expose),
 on top of 0a4c941. ./install applies them after cloning the plugin.
-Refresh: git -C ~/.config/omarchy/plugins/expose.window-overview diff > setup/patches/expose.window-overview.patch
+Refresh (keeps these lines): sed -i '/^diff --git/,$d' setup/patches/expose.window-overview.patch &&
+git -C ~/.config/omarchy/plugins/expose.window-overview diff --src-prefix=a/ --dst-prefix=b/ 0a4c941 >> setup/patches/expose.window-overview.patch
 
-diff --git i/GridLayout.js w/GridLayout.js
+diff --git a/GridLayout.js b/GridLayout.js
 index bf48359..0a2e127 100644
---- i/GridLayout.js
-+++ w/GridLayout.js
+--- a/GridLayout.js
++++ b/GridLayout.js
 @@ -89,6 +89,306 @@ function composeRows(rows, scale, width, height, gap, padding, footerHeight) {
      return result;
  }
@@ -313,10 +314,10 @@ index bf48359..0a2e127 100644
  // Card rectangles for windows of the given aspect ratios, indexed like ratios.
  // Every row count that fits is tried and the largest cards win: a card's title
  // band and padding make it taller than its preview, so no estimate from the
-diff --git i/Overview.qml w/Overview.qml
+diff --git a/Overview.qml b/Overview.qml
 index dfe88bb..5d4079e 100644
---- i/Overview.qml
-+++ w/Overview.qml
+--- a/Overview.qml
++++ b/Overview.qml
 @@ -58,6 +58,11 @@ Item {
      readonly property string previewPlacement: SettingsSchema.read(root.pluginEntry, "previewPlacement")
      readonly property string windowFooterStyle: SettingsSchema.read(root.pluginEntry, "windowFooterStyle")
@@ -738,10 +739,10 @@ index dfe88bb..5d4079e 100644
                                  + (root.workspaceStrip ? "1–0 workspace   " : "")
                                  + "Shift+Q close   Enter open   Esc close"
                              textFormat: Text.PlainText
-diff --git i/README.md w/README.md
+diff --git a/README.md b/README.md
 index 474b577..b99330c 100644
---- i/README.md
-+++ w/README.md
+--- a/README.md
++++ b/README.md
 @@ -177,6 +177,8 @@ omarchy-shell expose previewPlacement in-place   # in-place | centered
  omarchy-shell expose livePreviews on             # on (default) | off: stills, lighter on slower computers
  omarchy-shell expose windowFooterStyle floating  # floating | integrated | overlay | centered
@@ -751,10 +752,10 @@ index 474b577..b99330c 100644
  omarchy-shell expose multiMonitorMode mirrored   # mirrored | per-monitor
  omarchy-shell expose hotCorner on                # on | off, every corner
  omarchy-shell expose hotCornerAction bottom-left app-windows  # corner: off | all-windows | app-windows | desktop | notifications | apps | screensaver | lock-screen | command
-diff --git i/SettingsSchema.js w/SettingsSchema.js
+diff --git a/SettingsSchema.js b/SettingsSchema.js
 index e982c9a..55fba0a 100644
---- i/SettingsSchema.js
-+++ w/SettingsSchema.js
+--- a/SettingsSchema.js
++++ b/SettingsSchema.js
 @@ -47,6 +47,18 @@ var specs = {
              { label: "Lift", value: "lift" }
          ]
@@ -774,10 +775,10 @@ index e982c9a..55fba0a 100644
      animationStyle: {
          fallback: "original",
          options: [
-diff --git i/SettingsView.qml w/SettingsView.qml
+diff --git a/SettingsView.qml b/SettingsView.qml
 index 9c63339..71793b6 100644
---- i/SettingsView.qml
-+++ w/SettingsView.qml
+--- a/SettingsView.qml
++++ b/SettingsView.qml
 @@ -992,7 +992,7 @@ Item {
          var categoryButton = settingsCategoryRepeater.itemAt(settingsView.controller.settingsCategoryIndex);
          var controls = [
@@ -821,10 +822,10 @@ index 9c63339..71793b6 100644
                          SettingRow {
                              label: "Quick Look position"
                              description: "When you press Space, enlarge the preview near its card or at the center of the display."
-diff --git i/WindowCard.qml w/WindowCard.qml
+diff --git a/WindowCard.qml b/WindowCard.qml
 index ddb703d..8a98f5b 100644
---- i/WindowCard.qml
-+++ w/WindowCard.qml
+--- a/WindowCard.qml
++++ b/WindowCard.qml
 @@ -27,14 +27,15 @@ Ui.BorderSurface {
      // The close button is its own hover target, so the card counts as
      // hovered while the pointer is on it too.
@@ -916,10 +917,10 @@ index ddb703d..8a98f5b 100644
  
          NumberAnimation {
              duration: card.controller.previewAnimationDuration
-diff --git i/tests/theme/shell.qml w/tests/theme/shell.qml
+diff --git a/tests/theme/shell.qml b/tests/theme/shell.qml
 index a045ea1..eebcfe9 100644
---- i/tests/theme/shell.qml
-+++ w/tests/theme/shell.qml
+--- a/tests/theme/shell.qml
++++ b/tests/theme/shell.qml
 @@ -38,6 +38,9 @@ ShellRoot {
          property string previewPlacement: "in-place"
          property string windowFooterStyle: "floating"
@@ -939,10 +940,10 @@ index a045ea1..eebcfe9 100644
          require(items.length === expectedCounts[index % 6], "focusable controls on page " + index);
          settings.focusSettingsCategory();
          require(items[0].activeFocus, "category focus on page " + index);
-diff --git i/tests/tst_grid_layout.qml w/tests/tst_grid_layout.qml
+diff --git a/tests/tst_grid_layout.qml b/tests/tst_grid_layout.qml
 index d310a84..f91a93d 100644
---- i/tests/tst_grid_layout.qml
-+++ w/tests/tst_grid_layout.qml
+--- a/tests/tst_grid_layout.qml
++++ b/tests/tst_grid_layout.qml
 @@ -28,6 +28,199 @@ TestCase {
          return (rect.width - padding * 2) / (rect.height - footer - padding * 3);
      }
@@ -1143,10 +1144,10 @@ index d310a84..f91a93d 100644
      function test_noWindowsOrNoSpaceLaysOutNothing() {
          compare(layoutFor([]).length, 0);
          compare(GridLayout.computeLayout([1.6], 0, areaHeight, gap, padding, footer).length, 0);
-diff --git i/tests/tst_settings_schema.qml w/tests/tst_settings_schema.qml
+diff --git a/tests/tst_settings_schema.qml b/tests/tst_settings_schema.qml
 index 902eaf4..8046308 100644
---- i/tests/tst_settings_schema.qml
-+++ w/tests/tst_settings_schema.qml
+--- a/tests/tst_settings_schema.qml
++++ b/tests/tst_settings_schema.qml
 @@ -11,6 +11,10 @@ TestCase {
          compare(Schema.read(null, "moveCursorToWindow"), true);
          compare(Schema.read(null, "hotCornerAllDisplays"), false);
