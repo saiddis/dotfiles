@@ -43,6 +43,7 @@ Each top-level folder is a stow package, mirroring `$HOME`.
 | `herdr` | the terminal multiplexer |
 | `bin` | `device-notify` (USB/Bluetooth connect notices) and its user service, the keybinding menus |
 | `evremap` | keyboard remaps (system service, see above) |
+| `agents` `claude` `codex` | global agent rules (`~/.agents/AGENTS.md`, which Claude Code and Codex read) and Claude Code settings; tstack skills are linked from `~/tstack` |
 | `legacy/` | the pre-Omarchy i3/Hyprland setup, kept for reference; never linked |
 
 Most packages link the whole `~/.config/<name>` folder rather than each file:

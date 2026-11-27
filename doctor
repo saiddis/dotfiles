@@ -41,6 +41,14 @@ while read -r name _; do
   [[ -e $HOME/.config/omarchy/themes/$name ]] || bad "Omarchy theme $name is missing"
 done < <(entries omarchy-themes.txt)
 
+for skill in "$TSTACK_DIR"/skills/*/; do
+  name=$(basename "$skill")
+  links_to "$SKILL_HUB/$name" "$skill" || bad "~/.agents/skills/$name is $(describe "$SKILL_HUB/$name"), not a link to tstack's"
+  [[ $(readlink "$CLAUDE_SKILLS/$name") == "$SKILL_HUB/$name" ]] || bad "~/.claude/skills/$name is $(describe "$CLAUDE_SKILLS/$name"), not a link to ~/.agents/skills/$name"
+  [[ -e $CODEX_SKILLS/$name || -L $CODEX_SKILLS/$name ]] && bad "~/.codex/skills/$name duplicates ~/.agents/skills/$name (Codex reads both)"
+done
+[[ -d $TSTACK_DIR ]] || bad "tstack isn't cloned at ${TSTACK_DIR/#$HOME/~}"
+
 [[ $(systemctl --user is-enabled device-notify.service 2>/dev/null) == enabled ]] || bad "device-notify.service isn't enabled"
 
 if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then

@@ -126,6 +126,24 @@ while read -r name url; do
   [[ -e $themes/$name ]] || run git clone --quiet -- "$url" "$themes/$name"
 done < <(entries omarchy-themes.txt)
 
+say "Agent skills (tstack)"
+[[ -d $TSTACK_DIR ]] || run git clone --quiet -- "$TSTACK_URL" "$TSTACK_DIR"
+run mkdir -p "$SKILL_HUB" "$CLAUDE_SKILLS"
+# Puts link $1 -> $2 in place, moving aside whatever else is there (a copy
+# from tstack's README install)
+place() {
+  links_to "$1" "$2" && [[ $(readlink "$1") == "$2" ]] && return
+  [[ -e $1 || -L $1 ]] && backup "$1"
+  run ln -s "$2" "$1"
+}
+for skill in "$TSTACK_DIR"/skills/*/; do
+  name=$(basename "$skill")
+  place "$SKILL_HUB/$name" "${skill%/}"
+  place "$CLAUDE_SKILLS/$name" "$SKILL_HUB/$name"
+  # Codex finds it in ~/.agents/skills; a second copy would list it twice
+  [[ -e $CODEX_SKILLS/$name || -L $CODEX_SKILLS/$name ]] && backup "$CODEX_SKILLS/$name"
+done
+
 say "Services"
 if [[ $(systemctl --user is-enabled device-notify.service 2>/dev/null) != enabled ]]; then
   run systemctl --user daemon-reload
