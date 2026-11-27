@@ -99,9 +99,9 @@ return {
         map("n", "<C-e>", play(s.eval_file), "Play file")
         map("n", "<localleader>f", play(s.eval_file), "Play file")
         map("n", "<localleader>e", play(s.eval_line), "Play line")
-        -- <Esc> first, so '< and '> mark this selection
-        map("x", "<localleader>e", "<Esc><Cmd>StrudelEval<CR>", "Play selection")
-        map("x", "<C-e>", "<Esc><Cmd>StrudelEval<CR>", "Play selection")
+        -- <Esc> first, so '< and '> mark this selection, then pass them as the range
+        map("x", "<localleader>e", "<Esc><Cmd>'<,'>StrudelEval<CR>", "Play selection")
+        map("x", "<C-e>", "<Esc><Cmd>'<,'>StrudelEval<CR>", "Play selection")
         map("n", "<localleader>s", play(s.stop), "Stop sound (hush)")
       end
       local group = vim.api.nvim_create_augroup("strudel_buffers", { clear = true })
