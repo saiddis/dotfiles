@@ -1,3 +1,4 @@
+# shellcheck shell=bash disable=SC2034  # sourced by install and doctor
 # What ./install links and ./doctor checks. Sourced, not run.
 
 # Stow packages (folders at the top of this repo), in install order
