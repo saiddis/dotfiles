@@ -39,6 +39,11 @@ links_to "$NVIM_THEME_LINK" "$NVIM_THEME_TARGET" || bad "Neovim's theme.lua is $
 while read -r id _; do
   [[ -e $HOME/.config/omarchy/plugins/$id ]] || bad "Omarchy plugin $id is missing"
 done < <(entries omarchy-plugins.txt)
+for patch in "$DOTFILES"/setup/patches/*.patch; do
+  dir="$HOME/.config/omarchy/plugins/$(basename "$patch" .patch)"
+  [[ -d $dir ]] && ! git -C "$dir" apply --reverse --check "$patch" 2>/dev/null &&
+    bad "${patch##*/} isn't applied to ${dir##*/}"
+done
 while read -r name _; do
   [[ -e $HOME/.config/omarchy/themes/$name ]] || bad "Omarchy theme $name is missing"
 done < <(entries omarchy-themes.txt)

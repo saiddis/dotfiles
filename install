@@ -142,6 +142,17 @@ if [[ -x $plugins/typecraft.omacast/bin/omacast && ! -e $HOME/.local/bin/omacast
   run mkdir -p "$HOME/.local/bin"
   run ln -s "$plugins/typecraft.omacast/bin/omacast" "$HOME/.local/bin/omacast"
 fi
+# Local changes to other people's plugins, kept as patches (setup/patches)
+for patch in "$DOTFILES"/setup/patches/*.patch; do
+  dir="$plugins/$(basename "$patch" .patch)"
+  [[ -d $dir ]] || continue
+  git -C "$dir" apply --reverse --check "$patch" 2>/dev/null && continue
+  if git -C "$dir" apply --check "$patch" 2>/dev/null; then
+    run git -C "$dir" apply "$patch"
+  else
+    echo "  ${patch##*/} doesn't apply to ${dir##*/} (updated upstream?); see the patch's header"
+  fi
+done
 themes="$HOME/.config/omarchy/themes"
 while read -r name url; do
   [[ -e $themes/$name ]] || run git clone --quiet -- "$url" "$themes/$name"

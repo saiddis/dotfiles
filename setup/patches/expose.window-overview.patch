@@ -1,0 +1,1160 @@
+Local changes to expose.window-overview (github.com/kristofferR/omarchy-expose),
+on top of 0a4c941. ./install applies them after cloning the plugin.
+Refresh: git -C ~/.config/omarchy/plugins/expose.window-overview diff > setup/patches/expose.window-overview.patch
+
+diff --git i/GridLayout.js w/GridLayout.js
+index bf48359..0a2e127 100644
+--- i/GridLayout.js
++++ w/GridLayout.js
+@@ -89,6 +89,306 @@ function composeRows(rows, scale, width, height, gap, padding, footerHeight) {
+     return result;
+ }
+ 
++// Workspace rows, like niri's overview: one row per workspace, top to bottom
++// by row key, and one zoom for every window so they keep their real relative
++// sizes. A row runs left to right in on-screen order and is shifted so its
++// focused window sits in the middle. The zoom shrinks from maxScale to fit the
++// rows, but not below minScale: past that the rows are taller than the area
++// and scroll, as does any row wider than it (see scrolledRows).
++// items: { row, height, ratio, x, y, focused } with height in desktop pixels.
++// Returns card rectangles indexed like items, each with its row key, plus
++// contentHeight for the whole stack.
++function computeWorkspaceRows(items, width, height, gap, padding, footerHeight, maxScale, minScale) {
++    var result = [];
++    if (!items.length || width <= 0 || height <= 0)
++        return result;
++
++    var membersByKey = {};
++    var rowKeys = [];
++    for (var itemIndex = 0; itemIndex < items.length; itemIndex++) {
++        var key = Number(items[itemIndex].row);
++        if (!membersByKey.hasOwnProperty(String(key))) {
++            membersByKey[String(key)] = [];
++            rowKeys.push(key);
++        }
++        membersByKey[String(key)].push(itemIndex);
++    }
++    rowKeys.sort(function (a, b) { return a - b; });
++
++    var footerSpacing = footerHeight > 0 ? padding : 0;
++    var chrome = padding * 2 + footerHeight + footerSpacing;
++    var perRow = (height - (rowKeys.length - 1) * gap) / rowKeys.length;
++    var scale = maxScale > 0 ? maxScale : 1;
++    var rows = [];
++    for (var keyIndex = 0; keyIndex < rowKeys.length; keyIndex++) {
++        var members = membersByKey[String(rowKeys[keyIndex])].slice();
++        members.sort(function (a, b) {
++            return (items[a].x - items[b].x) || (items[a].y - items[b].y) || (a - b);
++        });
++        var tallest = 1;
++        for (var memberIndex = 0; memberIndex < members.length; memberIndex++)
++            tallest = Math.max(tallest, items[members[memberIndex]].height || 1);
++        scale = Math.min(scale, (perRow - chrome) / tallest);
++        rows.push({ members: members, tallest: tallest });
++    }
++    scale = Math.max(scale, minScale > 0 ? minScale : 0.01);
++
++    var total = (rows.length - 1) * gap;
++    for (var sizeIndex = 0; sizeIndex < rows.length; sizeIndex++) {
++        rows[sizeIndex].height = scale * rows[sizeIndex].tallest + chrome;
++        total += rows[sizeIndex].height;
++    }
++
++    // Rows that fit are centred; a taller stack starts half a gap from the top.
++    var overflows = total > height;
++    var top = overflows ? gap / 2 : (height - total) / 2;
++    result.contentHeight = overflows ? total + gap : height;
++    for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
++        var row = rows[rowIndex];
++        var cards = [];
++        var left = 0;
++        var centre = null;
++        for (var cardIndex = 0; cardIndex < row.members.length; cardIndex++) {
++            var item = items[row.members[cardIndex]];
++            var previewHeight = scale * (item.height || 1);
++            var card = {
++                index: row.members[cardIndex],
++                x: left,
++                width: previewHeight * item.ratio + padding * 2,
++                height: previewHeight + chrome
++            };
++            if (item.focused && centre === null)
++                centre = card.x + card.width / 2;
++            cards.push(card);
++            left += card.width + gap;
++        }
++        if (centre === null)
++            centre = cards[0].x + cards[0].width / 2;
++        var shift = width / 2 - centre;
++        for (var placedIndex = 0; placedIndex < cards.length; placedIndex++) {
++            var placed = cards[placedIndex];
++            result[placed.index] = {
++                x: placed.x + shift,
++                y: top + (row.height - placed.height) / 2,
++                width: placed.width,
++                height: placed.height,
++                row: rowKeys[rowIndex],
++                label: items[placed.index].label !== undefined ? items[placed.index].label : rowKeys[rowIndex]
++            };
++        }
++        top += row.height + gap;
++    }
++    return result;
++}
++
++// How far workspace rows can scroll. Vertically from minY to maxY: when the
++// rows are taller than the area, far enough to centre the first and the last
++// row, as niri centres any workspace. Each row horizontally between min and
++// max, which always include 0 (the row centred on its focused window) and
++// reach far enough to centre either end window, or to bring either end of the
++// row margin pixels inside the area.
++function rowsScrollLimits(rects, width, height, margin) {
++    var limits = { minY: 0, maxY: Math.max(0, (rects.contentHeight || 0) - height), rows: {} };
++    var spans = rowSpans(rects);
++    if (limits.maxY > 0 && spans.length) {
++        limits.minY = Math.min(0, spans[0].centre - height / 2);
++        limits.maxY = Math.max(limits.maxY, spans[spans.length - 1].centre - height / 2);
++    }
++    var ends = {};
++    for (var index = 0; index < rects.length; index++) {
++        var rect = rects[index];
++        if (!rect)
++            continue;
++        var key = String(rect.row);
++        var centre = rect.x + rect.width / 2;
++        if (!ends[key])
++            ends[key] = { left: rect.x, right: rect.x + rect.width, first: centre, last: centre };
++        ends[key].left = Math.min(ends[key].left, rect.x);
++        ends[key].right = Math.max(ends[key].right, rect.x + rect.width);
++        ends[key].first = Math.min(ends[key].first, centre);
++        ends[key].last = Math.max(ends[key].last, centre);
++    }
++    for (var row in ends) {
++        limits.rows[row] = {
++            min: Math.min(0, width - margin - ends[row].right, width / 2 - ends[row].last),
++            max: Math.max(0, margin - ends[row].left, width / 2 - ends[row].first)
++        };
++    }
++    return limits;
++}
++
++function clampedScroll(value, low, high) {
++    return Math.max(low, Math.min(high, value));
++}
++
++// The rows' rectangles moved by a vertical scroll and per-row horizontal
++// scrolls (scrollX maps row key to offset).
++function scrolledRows(rects, scrollY, scrollX) {
++    var result = [];
++    for (var index = 0; index < rects.length; index++) {
++        var rect = rects[index];
++        if (!rect)
++            continue;
++        result[index] = {
++            x: rect.x + ((scrollX && scrollX[String(rect.row)]) || 0),
++            y: rect.y - scrollY,
++            width: rect.width,
++            height: rect.height,
++            row: rect.row
++        };
++    }
++    result.contentHeight = rects.contentHeight;
++    return result;
++}
++
++// Scroll offsets that show card index whole, margin pixels inside the area,
++// moving as little as possible; with centre, its row is centred vertically
++// instead. Returns { y, x } with x a new per-row map.
++function revealInRows(rects, index, scrollY, scrollX, width, height, margin, centre) {
++    var x = {};
++    for (var key in scrollX || {})
++        x[key] = scrollX[key];
++    var rect = rects[index];
++    if (!rect)
++        return { y: scrollY, x: x };
++    var limits = rowsScrollLimits(rects, width, height, margin);
++
++    var y = scrollY;
++    if (centre) {
++        y = rect.y + rect.height / 2 - height / 2;
++    } else if (rect.y - y < margin) {
++        y = rect.y - margin;
++    } else if (rect.y + rect.height - y > height - margin) {
++        y = rect.y + rect.height - (height - margin);
++    }
++
++    var row = String(rect.row);
++    var offset = x[row] || 0;
++    var left = rect.x + offset;
++    if (left < margin)
++        offset += margin - left;
++    else if (left + rect.width > width - margin)
++        offset -= left + rect.width - (width - margin);
++    var rowLimits = limits.rows[row] || { min: 0, max: 0 };
++    x[row] = clampedScroll(offset, rowLimits.min, rowLimits.max);
++    return { y: clampedScroll(y, limits.minY, limits.maxY), x: x };
++}
++
++// The workspace rows from top to bottom, unscrolled:
++// { row, label, top, bottom, centre }.
++function rowSpans(rects) {
++    var byKey = {};
++    var spans = [];
++    for (var index = 0; index < rects.length; index++) {
++        var rect = rects[index];
++        if (!rect)
++            continue;
++        var key = String(rect.row);
++        if (!byKey[key]) {
++            byKey[key] = { row: rect.row, label: rect.label !== undefined ? String(rect.label) : key, top: rect.y, bottom: rect.y + rect.height };
++            spans.push(byKey[key]);
++        }
++        byKey[key].top = Math.min(byKey[key].top, rect.y);
++        byKey[key].bottom = Math.max(byKey[key].bottom, rect.y + rect.height);
++    }
++    spans.sort(function (a, b) { return a.top - b.top; });
++    for (var spanIndex = 0; spanIndex < spans.length; spanIndex++)
++        spans[spanIndex].centre = (spans[spanIndex].top + spans[spanIndex].bottom) / 2;
++    return spans;
++}
++
++// The index in rowSpans of the row nearest the middle of the area.
++function nearestRowIndex(rects, scrollY, height) {
++    var spans = rowSpans(rects);
++    var middle = scrollY + height / 2;
++    var nearest = spans.length ? 0 : -1;
++    for (var index = 1; index < spans.length; index++)
++        if (Math.abs(spans[index].centre - middle) < Math.abs(spans[nearest].centre - middle))
++            nearest = index;
++    return nearest;
++}
++
++// The vertical scroll that centres row index of rowSpans, within the limits.
++function centreRowScroll(rects, index, height) {
++    var spans = rowSpans(rects);
++    if (index < 0 || index >= spans.length)
++        return 0;
++    var limits = rowsScrollLimits(rects, 0, height, 0);
++    return clampedScroll(spans[index].centre - height / 2, limits.minY, limits.maxY);
++}
++
++// One scroll step through workspace rows, as in niri: the vertical scroll that
++// centres the row after (direction 1) or before (-1) the row nearest the middle
++// now, or that row itself when it sits off centre the other way. Rows the scroll limits cannot centre are passed over; past the last
++// row the scroll stays put.
++function stepRowsY(rects, scrollY, height, direction) {
++    var spans = rowSpans(rects);
++    var nearest = nearestRowIndex(rects, scrollY, height);
++    if (nearest < 0)
++        return scrollY;
++    // A row off centre in the step's direction is centred first.
++    var current = centreRowScroll(rects, nearest, height);
++    if ((current - scrollY) * direction > 0.5)
++        return current;
++    for (var target = nearest + direction; target >= 0 && target < spans.length; target += direction) {
++        var next = centreRowScroll(rects, target, height);
++        if (Math.abs(next - scrollY) > 0.5)
++            return next;
++    }
++    return scrollY;
++}
++
++// The centres of a row's windows, left to right, unscrolled.
++function rowWindowCentres(rects, row) {
++    var key = String(row);
++    var centres = [];
++    for (var index = 0; index < rects.length; index++)
++        if (rects[index] && String(rects[index].row) === key)
++            centres.push(rects[index].x + rects[index].width / 2);
++    centres.sort(function (a, b) { return a - b; });
++    return centres;
++}
++
++// The index in rowWindowCentres of the window nearest the middle at offset.
++function nearestWindowIndex(rects, row, offset, width) {
++    var centres = rowWindowCentres(rects, row);
++    var middle = width / 2 - offset;
++    var nearest = centres.length ? 0 : -1;
++    for (var index = 1; index < centres.length; index++)
++        if (Math.abs(centres[index] - middle) < Math.abs(centres[nearest] - middle))
++            nearest = index;
++    return nearest;
++}
++
++// The row's horizontal offset that centres its window index, within the limits.
++function centreWindowOffset(rects, row, index, width, margin) {
++    var centres = rowWindowCentres(rects, row);
++    if (index < 0 || index >= centres.length)
++        return 0;
++    var limits = rowsScrollLimits(rects, width, 0, margin).rows[String(row)] || { min: 0, max: 0 };
++    return clampedScroll(width / 2 - centres[index], limits.min, limits.max);
++}
++
++// One scroll step along a row: the row's horizontal offset that centres the
++// window after (direction 1) or before (-1) the one nearest the middle now.
++function stepRowX(rects, row, scrollX, width, margin, direction) {
++    var key = String(row);
++    var offset = (scrollX && scrollX[key]) || 0;
++    var count = rowWindowCentres(rects, row).length;
++    var nearest = nearestWindowIndex(rects, row, offset, width);
++    if (nearest < 0)
++        return offset;
++    var current = centreWindowOffset(rects, row, nearest, width, margin);
++    if ((offset - current) * direction > 0.5)
++        return current;
++    for (var target = nearest + direction; target >= 0 && target < count; target += direction) {
++        var next = centreWindowOffset(rects, row, target, width, margin);
++        if (Math.abs(next - offset) > 0.5)
++            return next;
++    }
++    return offset;
++}
++
+ // Card rectangles for windows of the given aspect ratios, indexed like ratios.
+ // Every row count that fits is tried and the largest cards win: a card's title
+ // band and padding make it taller than its preview, so no estimate from the
+diff --git i/Overview.qml w/Overview.qml
+index dfe88bb..5d4079e 100644
+--- i/Overview.qml
++++ w/Overview.qml
+@@ -58,6 +58,11 @@ Item {
+     readonly property string previewPlacement: SettingsSchema.read(root.pluginEntry, "previewPlacement")
+     readonly property string windowFooterStyle: SettingsSchema.read(root.pluginEntry, "windowFooterStyle")
+     readonly property string selectionStyle: SettingsSchema.read(root.pluginEntry, "selectionStyle")
++    readonly property string layoutMode: SettingsSchema.read(root.pluginEntry, "windowLayout")
++    readonly property bool workspaceRowLabels: SettingsSchema.read(root.pluginEntry, "workspaceRowLabels")
++    // True while a touchpad swipe drags the workspace rows: cards follow the
++    // fingers directly instead of gliding.
++    property bool rowsTracking: false
+     // Off shows each window as the single frame its capture starts with.
+     readonly property bool livePreviews: SettingsSchema.read(root.pluginEntry, "livePreviews")
+     readonly property var animationStyles: SettingsSchema.values("animationStyle")
+@@ -1298,6 +1303,62 @@ Item {
+         onTriggered: root.closingToplevels = []
+     }
+ 
++    // Window addresses by last focus, most recent first, kept from Hyprland's
++    // activewindowv2 events. The plugin stays loaded, so each workspace's
++    // focused window is known the moment Exposé opens, before a toplevel
++    // refresh could report it.
++    property var recentAddresses: []
++
++    function noteFocus(address) {
++        var key = String(address || "").replace(/^0x/i, "").toLowerCase();
++        if (!/^[0-9a-f]+$/.test(key))
++            return;
++        var next = root.recentAddresses.filter(function (other) { return other !== key; });
++        next.unshift(key);
++        root.recentAddresses = next.slice(0, 256);
++    }
++
++    // Cards for the workspace rows layout: a row per workspace, special
++    // workspaces after the numbered ones, and on each row the window focused
++    // last on that workspace marked to sit in the middle.
++    function workspaceRowItems(tops) {
++        var recent = root.recentAddresses;
++        var items = tops.map(function (top) {
++            var ipc = WindowModel.ipcFor(top);
++            var workspace = top && top.workspace;
++            var id = Number(workspace ? workspace.id : NaN);
++            var size = ipc.size || [];
++            var at = ipc.at || [];
++            var position = recent.indexOf(String((top && top.address) || "").toLowerCase());
++            var history = Number(ipc.focusHistoryID);
++            var rank = top === root.originToplevel ? -1
++                : position !== -1 ? position
++                : recent.length + (isFinite(history) && history >= 0 ? history : 100000);
++            return {
++                row: isFinite(id) ? (id > 0 ? id : 100000 - id) : 200000,
++                label: root.workspaceName(top),
++                ratio: root.aspectRatioFor(top),
++                height: Number(size[1]) || 1,
++                x: Number(at[0]) || 0,
++                y: Number(at[1]) || 0,
++                rank: rank,
++                focused: false
++            };
++        });
++        var focusedByRow = {};
++        for (var index = 0; index < items.length; index++) {
++            var best = focusedByRow[items[index].row];
++            if (best === undefined || items[index].rank < items[best].rank)
++                focusedByRow[items[index].row] = index;
++        }
++        for (var row in focusedByRow)
++            items[focusedByRow[row]].focused = true;
++        return items;
++    }
++
++    // Bumped each time Exposé opens, so per-session state such as scrolling resets.
++    property int sessionSerial: 0
++
+     function resetSessionToplevels() {
+         var next = [];
+         for (var index = 0; index < root.allToplevels.length; index++)
+@@ -1306,6 +1367,7 @@ Item {
+         root.sessionToplevels = next;
+         root.captureSessionAspectRatios();
+         root.modelRevision++;
++        root.sessionSerial++;
+     }
+ 
+     function syncSessionToplevels() {
+@@ -1573,6 +1635,12 @@ Item {
+             if (!event.isAutoRepeat)
+                 root.toggleWorkspaceScope();
+         }
++        // Vim keys on Ctrl (plain letters filter): Ctrl+H/J/K/L move like the arrows.
++        else if ((event.modifiers & Qt.ControlModifier)
++                && [Qt.Key_H, Qt.Key_J, Qt.Key_K, Qt.Key_L].indexOf(event.key) !== -1)
++            root.moveDirectional(event.key === Qt.Key_H ? -1 : event.key === Qt.Key_L ? 1 : 0,
++                                 event.key === Qt.Key_K ? -1 : event.key === Qt.Key_J ? 1 : 0,
++                                 Boolean(event.modifiers & Qt.ShiftModifier));
+         else if (event.key === Qt.Key_Left)
+             root.moveDirectional(-1, 0, Boolean(event.modifiers & Qt.ShiftModifier));
+         else if (event.key === Qt.Key_Right)
+@@ -1806,6 +1874,8 @@ Item {
+                 root.toggle();
+             if (event && event.name === "fullscreen" && root.hotCornerIgnoreFullscreen)
+                 Hyprland.refreshToplevels();
++            if (event && event.name === "activewindowv2")
++                root.noteFocus(event.data);
+         }
+     }
+ 
+@@ -1896,6 +1966,8 @@ Item {
+         function previewPlacement(mode: string): string { return root.setSettingFromIpc("previewPlacement", mode); }
+         function windowFooterStyle(style: string): string { return root.setSettingFromIpc("windowFooterStyle", style); }
+         function selectionStyle(style: string): string { return root.setSettingFromIpc("selectionStyle", style); }
++        function windowLayout(style: string): string { return root.setSettingFromIpc("windowLayout", style); }
++        function workspaceRowLabels(mode: string): string { return root.setSettingFromIpc("workspaceRowLabels", mode); }
+         function livePreviews(mode: string): string { return root.setSettingFromIpc("livePreviews", mode); }
+         function animationStyle(style: string): string { return root.setSettingFromIpc("animationStyle", style); }
+         function backgroundMode(mode: string): string { return root.setSettingFromIpc("backgroundMode", mode); }
+@@ -2413,6 +2485,8 @@ Item {
+ 
+                     Ui.BorderSurface {
+                         id: searchBar
++                        // Local change: hidden until you type a filter
++                        visible: !!root.filterText
+                         Layout.alignment: Qt.AlignHCenter
+                         Layout.preferredWidth: Math.min(Style.space(760), overviewWindow.width - Style.space(48))
+                         Layout.preferredHeight: Style.space(48)
+@@ -2511,8 +2585,240 @@ Item {
+                         id: overviewArea
+                         Layout.fillWidth: true
+                         Layout.fillHeight: true
++                        // Workspace rows before scrolling: niri's half-size zoom, shrinking
++                        // to fit down to 0.3, past which the rows scroll instead.
++                        readonly property var rowsBase: {
++                            var revision = root.modelRevision;
++                            if (root.layoutMode !== "workspaces")
++                                return null;
++                            return GridLayout.computeWorkspaceRows(root.workspaceRowItems(overviewWindow.screenToplevels), width, height, Style.space(32), Style.spacing.sm, root.windowFooterHeight, 0.5, 0.3);
++                        }
++                        readonly property real rowsMargin: Style.space(16)
++                        property real rowsScrollY: 0
++                        property var rowsScrollX: ({})
++
++                        // Scroll so a card shows whole; centre puts its row in the middle.
++                        function revealCard(index, centre) {
++                            if (!overviewArea.rowsBase || index < 0)
++                                return;
++                            var next = GridLayout.revealInRows(overviewArea.rowsBase, index, overviewArea.rowsScrollY, overviewArea.rowsScrollX,
++                                width, height, overviewArea.rowsMargin, centre);
++                            overviewArea.rowsScrollY = next.y;
++                            overviewArea.rowsScrollX = next.x;
++                        }
++
++                        function revealSelection(centre) {
++                            overviewArea.revealCard(overviewWindow.screenToplevels.indexOf(root.selection), centre);
++                        }
++
++                        // Scrolling moves in steps, as in niri: a step up or down centres
++                        // the next workspace row; a sideways step centres the next window
++                        // of the row under the pointer (or of the row in the middle).
++                        function stepRows(vertical, direction, pointerY) {
++                            var base = overviewArea.rowsBase;
++                            if (!base)
++                                return;
++                            if (vertical) {
++                                overviewArea.rowsScrollY = GridLayout.stepRowsY(base, overviewArea.rowsScrollY, height, direction);
++                                return;
++                            }
++                            var row = overviewArea.rowUnder(pointerY);
++                            if (row === null)
++                                return;
++                            overviewArea.setRowOffset(row, GridLayout.stepRowX(base, row, overviewArea.rowsScrollX, width, overviewArea.rowsMargin, direction));
++                        }
++
++                        // A mouse wheel moves a step per notch. A touchpad swipe drags the
++                        // rows with the fingers and, on lifting them, snaps to the nearest
++                        // row or window, or to the next one if the swipe went far enough.
++                        property real wheelAccumX: 0
++                        property real wheelAccumY: 0
++                        readonly property real touchpadGain: 2.5
++                        property string trackAxis: ""
++                        property real trackMoved: 0
++                        property real trackPending: 0
++                        property int trackStart: -1
++                        property var trackRow: null
++
++                        Timer {
++                            id: wheelAccumReset
++                            interval: 400
++                            onTriggered: {
++                                overviewArea.wheelAccumX = 0;
++                                overviewArea.wheelAccumY = 0;
++                            }
++                        }
++
++                        // Ends a swipe when the touchpad never reports the fingers lifting.
++                        Timer {
++                            id: trackIdle
++                            interval: 180
++                            onTriggered: overviewArea.endTracking()
++                        }
++
++                        function rowUnder(pointerY) {
++                            var spans = GridLayout.rowSpans(overviewArea.rowsBase);
++                            if (!spans.length)
++                                return null;
++                            for (var index = 0; index < spans.length; index++) {
++                                var top = spans[index].top - overviewArea.rowsScrollY;
++                                if (pointerY >= top && pointerY <= top + spans[index].bottom - spans[index].top)
++                                    return spans[index].row;
++                            }
++                            return spans[Math.max(0, GridLayout.nearestRowIndex(overviewArea.rowsBase, overviewArea.rowsScrollY, height))].row;
++                        }
++
++                        function setRowOffset(row, value) {
++                            var x = {};
++                            for (var other in overviewArea.rowsScrollX)
++                                x[other] = overviewArea.rowsScrollX[other];
++                            x[String(row)] = value;
++                            overviewArea.rowsScrollX = x;
++                        }
++
++                        function trackSwipe(dx, dy, pointerY) {
++                            var base = overviewArea.rowsBase;
++                            if (!overviewArea.trackAxis) {
++                                // The first few pixels pick the axis, as a scroll view does.
++                                overviewArea.wheelAccumX += dx;
++                                overviewArea.wheelAccumY += dy;
++                                if (Math.abs(overviewArea.wheelAccumX) < 4 && Math.abs(overviewArea.wheelAccumY) < 4)
++                                    return;
++                                var vertical = Math.abs(overviewArea.wheelAccumY) >= Math.abs(overviewArea.wheelAccumX);
++                                dx = vertical ? 0 : overviewArea.wheelAccumX;
++                                dy = vertical ? overviewArea.wheelAccumY : 0;
++                                overviewArea.wheelAccumX = 0;
++                                overviewArea.wheelAccumY = 0;
++                                overviewArea.trackAxis = vertical ? "y" : "x";
++                                overviewArea.trackMoved = 0;
++                                if (vertical) {
++                                    overviewArea.trackStart = GridLayout.nearestRowIndex(base, overviewArea.rowsScrollY, height);
++                                } else {
++                                    overviewArea.trackRow = overviewArea.rowUnder(pointerY);
++                                    overviewArea.trackStart = GridLayout.nearestWindowIndex(base, overviewArea.trackRow,
++                                        overviewArea.rowsScrollX[String(overviewArea.trackRow)] || 0, width);
++                                }
++                                root.rowsTracking = true;
++                            }
++                            var limits = GridLayout.rowsScrollLimits(base, width, height, overviewArea.rowsMargin);
++                            // Content follows the fingers: a positive delta shows what is
++                            // above or to the left.
++                            if (overviewArea.trackAxis === "y") {
++                                var moveY = dy * overviewArea.touchpadGain;
++                                overviewArea.trackMoved += moveY;
++                                overviewArea.rowsScrollY = GridLayout.clampedScroll(overviewArea.rowsScrollY - moveY, limits.minY, limits.maxY);
++                            } else {
++                                var moveX = dx * overviewArea.touchpadGain;
++                                var key = String(overviewArea.trackRow);
++                                var rowLimits = limits.rows[key] || { min: 0, max: 0 };
++                                overviewArea.trackMoved += moveX;
++                                overviewArea.setRowOffset(overviewArea.trackRow,
++                                    GridLayout.clampedScroll((overviewArea.rowsScrollX[key] || 0) + moveX, rowLimits.min, rowLimits.max));
++                            }
++                            trackIdle.restart();
++                        }
++
++                        function endTracking() {
++                            trackIdle.stop();
++                            overviewArea.wheelAccumX = 0;
++                            overviewArea.wheelAccumY = 0;
++                            var axis = overviewArea.trackAxis;
++                            overviewArea.trackAxis = "";
++                            // Gliding comes back on before the snap, so the snap animates.
++                            root.rowsTracking = false;
++                            var base = overviewArea.rowsBase;
++                            if (!axis || !base)
++                                return;
++                            // A swipe of a fifth of a row or more goes on to the next one.
++                            var far = Math.abs(overviewArea.trackMoved) >= Style.space(40);
++                            var direction = overviewArea.trackMoved > 0 ? -1 : 1;
++                            if (axis === "y") {
++                                var row = GridLayout.nearestRowIndex(base, overviewArea.rowsScrollY, height);
++                                if (row === overviewArea.trackStart && far)
++                                    row = Math.max(0, Math.min(GridLayout.rowSpans(base).length - 1, row + direction));
++                                overviewArea.rowsScrollY = GridLayout.centreRowScroll(base, row, height);
++                                return;
++                            }
++                            var key = String(overviewArea.trackRow);
++                            var window = GridLayout.nearestWindowIndex(base, overviewArea.trackRow, overviewArea.rowsScrollX[key] || 0, width);
++                            if (window === overviewArea.trackStart && far)
++                                window = Math.max(0, Math.min(GridLayout.rowWindowCentres(base, overviewArea.trackRow).length - 1, window + direction));
++                            overviewArea.setRowOffset(overviewArea.trackRow,
++                                GridLayout.centreWindowOffset(base, overviewArea.trackRow, window, width, overviewArea.rowsMargin));
++                        }
++
++                        // Cards stay inside the area once they have arrived, so rows
++                        // scrolled up do not cover the workspace strip.
++                        clip: overviewArea.rowsBase !== null && root.motionSettled
++
++                        Connections {
++                            target: root
++                            function onSessionSerialChanged() {
++                                trackIdle.stop();
++                                overviewArea.trackAxis = "";
++                                root.rowsTracking = false;
++                                overviewArea.rowsScrollY = 0;
++                                overviewArea.rowsScrollX = ({});
++                                Qt.callLater(function () { overviewArea.revealSelection(true); });
++                            }
++                            function onSelectionChanged() { overviewArea.revealSelection(false); }
++                        }
++
++                        WheelHandler {
++                            enabled: overviewArea.rowsBase !== null
++                            acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
++                            onWheel: function (event) {
++                                event.accepted = true;
++                                var pixels = event.pixelDelta.x !== 0 || event.pixelDelta.y !== 0;
++                                var swipe = pixels || event.phase !== Qt.NoScrollPhase;
++                                if (swipe) {
++                                    if (event.phase === Qt.ScrollMomentum)
++                                        return;
++                                    if (event.phase === Qt.ScrollBegin && overviewArea.trackAxis)
++                                        overviewArea.endTracking();
++                                    if (pixels) {
++                                        var px = event.pixelDelta.x;
++                                        var py = event.pixelDelta.y;
++                                        if (event.modifiers & Qt.ShiftModifier) {
++                                            px = px !== 0 ? px : py;
++                                            py = 0;
++                                        }
++                                        overviewArea.trackSwipe(px, py, point.position.y);
++                                    }
++                                    if (event.phase === Qt.ScrollEnd)
++                                        overviewArea.endTracking();
++                                    return;
++                                }
++                                var dx = event.angleDelta.x;
++                                var dy = event.angleDelta.y;
++                                if (event.modifiers & Qt.ShiftModifier) {
++                                    dx = dx !== 0 ? dx : dy;
++                                    dy = 0;
++                                } else if (Math.abs(dx) > Math.abs(dy)) {
++                                    dy = 0;
++                                } else {
++                                    dx = 0;
++                                }
++                                overviewArea.wheelAccumX += dx;
++                                overviewArea.wheelAccumY += dy;
++                                wheelAccumReset.restart();
++                                // One notch (120) is one step; a high-resolution wheel gets
++                                // there in smaller events.
++                                var vertical = Math.abs(overviewArea.wheelAccumY) >= 120;
++                                if (!vertical && Math.abs(overviewArea.wheelAccumX) < 120)
++                                    return;
++                                // A positive delta shows what is above or to the left.
++                                var amount = vertical ? overviewArea.wheelAccumY : overviewArea.wheelAccumX;
++                                overviewArea.wheelAccumX = 0;
++                                overviewArea.wheelAccumY = 0;
++                                overviewArea.stepRows(vertical, amount > 0 ? -1 : 1, point.position.y);
++                            }
++                        }
++
+                         readonly property var windowLayout: {
+                             var revision = root.modelRevision;
++                            if (overviewArea.rowsBase)
++                                return GridLayout.scrolledRows(overviewArea.rowsBase, overviewArea.rowsScrollY, overviewArea.rowsScrollX);
+                             var ratios = overviewWindow.screenToplevels.map(function (top) { return root.aspectRatioFor(top); });
+                             // The gap leaves room for a hovered card's lift and outline;
+                             // more only shrinks the cards on a short display.
+@@ -2549,6 +2855,47 @@ Item {
+                                 }
+                         }
+ 
++                        // Each workspace row's name at the left edge, centred on the row.
++                        Repeater {
++                            model: overviewArea.rowsBase && root.workspaceRowLabels && !root.filterText
++                                ? GridLayout.rowSpans(overviewArea.rowsBase)
++                                : []
++
++                            delegate: Rectangle {
++                                id: rowLabel
++                                required property var modelData
++                                x: overviewArea.rowsMargin
++                                y: rowLabel.modelData.centre - overviewArea.rowsScrollY - height / 2
++                                width: Math.max(height, rowLabelText.implicitWidth + Style.spacing.md * 2)
++                                height: rowLabelText.implicitHeight + Style.spacing.sm * 2
++                                radius: height / 2
++                                color: Commons.Color.menu.background
++                                opacity: root.motionProgress * 0.92
++                                layer.enabled: true
++                                layer.effect: BackdropShadow {}
++
++                                Behavior on y {
++                                    enabled: root.motionSettled && !root.rowsTracking
++
++                                    NumberAnimation {
++                                        duration: root.previewAnimationDuration
++                                        easing.type: root.previewAnimationEasing
++                                    }
++                                }
++
++                                Text {
++                                    id: rowLabelText
++                                    anchors.centerIn: parent
++                                    text: rowLabel.modelData.label
++                                    textFormat: Text.PlainText
++                                    horizontalAlignment: Text.AlignHCenter
++                                    color: Commons.Color.menu.text
++                                    font.family: Style.font.menuFamily
++                                    font.pixelSize: Style.font.heading
++                                }
++                            }
++                        }
++
+                         Text {
+                             anchors.centerIn: parent
+                             visible: overviewWindow.screenToplevels.length === 0
+@@ -2576,7 +2923,7 @@ Item {
+                         layer.effect: BackdropShadow {}
+ 
+                         Text {
+-                            text: "← ↑ ↓ → navigate   Space preview   Tab scope   "
++                            text: "Ctrl+hjkl or arrows navigate   Space preview   Tab scope   "
+                                 + (root.workspaceStrip ? "1–0 workspace   " : "")
+                                 + "Shift+Q close   Enter open   Esc close"
+                             textFormat: Text.PlainText
+diff --git i/README.md w/README.md
+index 474b577..b99330c 100644
+--- i/README.md
++++ w/README.md
+@@ -177,6 +177,8 @@ omarchy-shell expose previewPlacement in-place   # in-place | centered
+ omarchy-shell expose livePreviews on             # on (default) | off: stills, lighter on slower computers
+ omarchy-shell expose windowFooterStyle floating  # floating | integrated | overlay | centered
+ omarchy-shell expose selectionStyle outline      # outline | lift
++omarchy-shell expose windowLayout grid           # grid | workspaces (niri-style rows)
++omarchy-shell expose workspaceRowLabels on       # on | off: workspace names left of the rows
+ omarchy-shell expose multiMonitorMode mirrored   # mirrored | per-monitor
+ omarchy-shell expose hotCorner on                # on | off, every corner
+ omarchy-shell expose hotCornerAction bottom-left app-windows  # corner: off | all-windows | app-windows | desktop | notifications | apps | screensaver | lock-screen | command
+diff --git i/SettingsSchema.js w/SettingsSchema.js
+index e982c9a..55fba0a 100644
+--- i/SettingsSchema.js
++++ w/SettingsSchema.js
+@@ -47,6 +47,18 @@ var specs = {
+             { label: "Lift", value: "lift" }
+         ]
+     },
++    // Grid packs every window into balanced rows. Workspace rows works like
++    // niri's overview: a row per workspace, top to bottom, windows at their
++    // real relative sizes, each row centred on its workspace's focused window.
++    windowLayout: {
++        fallback: "grid",
++        options: [
++            { label: "Grid", value: "grid" },
++            { label: "Workspace rows", value: "workspaces" }
++        ]
++    },
++    // Workspace rows only: each row's workspace name at the left edge.
++    workspaceRowLabels: { fallback: true },
+     animationStyle: {
+         fallback: "original",
+         options: [
+diff --git i/SettingsView.qml w/SettingsView.qml
+index 9c63339..71793b6 100644
+--- i/SettingsView.qml
++++ w/SettingsView.qml
+@@ -992,7 +992,7 @@ Item {
+         var categoryButton = settingsCategoryRepeater.itemAt(settingsView.controller.settingsCategoryIndex);
+         var controls = [
+             [backgroundModeChoices, backgroundBlurSlider, backgroundDimSlider, bottomTextToggle],
+-            [livePreviewsToggle, selectionStyleChoices, previewPlacementChoices, movePointerToggle, closeButtonToggle, closeButtonSideChoices],
++            [livePreviewsToggle, selectionStyleChoices, windowLayoutChoices, workspaceRowLabelsToggle, previewPlacementChoices, movePointerToggle, closeButtonToggle, closeButtonSideChoices],
+             [windowFooterChoices, workspaceLabelStyleChoices],
+             [initialWorkspaceScopeChoices, displayModeChoicesControl, workspaceStripToggle, workspaceDragToggle],
+             [hotCornerToggle, hotCornerTopLeftAction, hotCornerTopLeftCommand, hotCornerTopRightAction, hotCornerTopRightCommand, hotCornerBottomLeftAction, hotCornerBottomLeftCommand, hotCornerBottomRightAction, hotCornerBottomRightCommand, hotCornerAllDisplaysToggle, hotCornerIgnoreFullscreenToggle, hotCornerDelaySlider],
+@@ -1291,6 +1291,33 @@ Item {
+                             }
+                         }
+ 
++                        SettingRow {
++                            label: "Layout"
++                            description: "Grid arranges every window to fill the screen. Workspace rows works like niri: one row per workspace from top to bottom, windows at their real relative sizes, and each row centered on the window you used last there."
++
++                            SettingChoices {
++                                id: windowLayoutChoices
++                                Layout.fillWidth: true
++                                value: settingsView.controller.layoutMode
++                                options: SettingsSchema.options("windowLayout")
++                                onChosen: function (value) { settingsView.controller.setSetting("windowLayout", value); }
++                            }
++                        }
++
++                        SettingRow {
++                            label: "Workspace names"
++                            description: "In workspace rows, show each row's workspace at the left edge, centered on the row."
++                            enabled: settingsView.controller.layoutMode === "workspaces"
++
++                            Item { Layout.fillWidth: true }
++
++                            SettingToggle {
++                                id: workspaceRowLabelsToggle
++                                checked: settingsView.controller.workspaceRowLabels
++                                onToggled: function (checked) { settingsView.controller.setSetting("workspaceRowLabels", checked); }
++                            }
++                        }
++
+                         SettingRow {
+                             label: "Quick Look position"
+                             description: "When you press Space, enlarge the preview near its card or at the center of the display."
+diff --git i/WindowCard.qml w/WindowCard.qml
+index ddb703d..8a98f5b 100644
+--- i/WindowCard.qml
++++ w/WindowCard.qml
+@@ -27,14 +27,15 @@ Ui.BorderSurface {
+     // The close button is its own hover target, so the card counts as
+     // hovered while the pointer is on it too.
+     property bool hovered: cardMouse.enabled && (cardMouse.containsMouse || closeHover.hovered)
++    // Hover takes the selection only once the pointer actually moves over the
++    // card (see cardMouse.onPositionChanged), so a cursor resting where the
++    // overview opens doesn't steal the keyboard's starting selection.
++    property var hoverStart: null
+     onHoveredChanged: {
+-        if (card.hovered) {
+-            if (card.acceptsKeyboard) {
+-                card.controller.hoveredToplevel = card.modelData;
+-                card.controller.selectedToplevel = card.modelData;
+-            }
+-        } else if (card.controller.hoveredToplevel === card.modelData) {
+-            card.controller.hoveredToplevel = null;
++        if (!card.hovered) {
++            card.hoverStart = null;
++            if (card.controller.hoveredToplevel === card.modelData)
++                card.controller.hoveredToplevel = null;
+         }
+     }
+     readonly property bool selected: card.acceptsKeyboard && inLayout && modelData === card.controller.selection
+@@ -65,7 +66,10 @@ Ui.BorderSurface {
+         ring.gradient = active.gradient;
+         return ring;
+     }
+-    readonly property color currentColor: Style.selectedStateColor(Commons.Color.menu.text, Commons.Color.accent)
++    // Local change: "you came from here" is a persistent marker, which this
++    // desktop draws grey (herdr sidebar row, T3 Code); blue stays the selection.
++    // Full-strength text against the others' dimmed captions still sets it apart.
++    readonly property color currentColor: Commons.Color.menu.text
+     // An excluded card keeps its last rectangle, so it neither
+     // animates toward the origin nor flies back in from it.
+     readonly property var packedRectSource: inLayout ? card.windowLayout[slot] : null
+@@ -163,6 +167,20 @@ Ui.BorderSurface {
+             card.grabY = mouse.y;
+         }
+         onPositionChanged: function(mouse) {
++            if (card.hovered && card.acceptsKeyboard && !card.dragging
++                    && card.controller.hoveredToplevel !== card.modelData) {
++                // Cards sliding in under a still cursor also report movement,
++                // so only count it once the opening motion has settled.
++                var at = cardMouse.mapToItem(null, mouse.x, mouse.y);
++                if (!card.controller.motionSettled) {
++                    card.hoverStart = null;
++                } else if (!card.hoverStart) {
++                    card.hoverStart = at;
++                } else if (Math.abs(at.x - card.hoverStart.x) + Math.abs(at.y - card.hoverStart.y) > 3) {
++                    card.controller.hoveredToplevel = card.modelData;
++                    card.controller.selectedToplevel = card.modelData;
++                }
++            }
+             if (!cardMouse.mayDrag)
+                 return;
+             var point = cardMouse.mapToItem(null, mouse.x, mouse.y);
+@@ -210,13 +228,14 @@ Ui.BorderSurface {
+             Layout.fillHeight: true
+ 
+             // Lift's glow behind the selected preview. Its blur layer exists
+-            // only while it shows.
++            // only while it shows. Local change: no glow; the lift (scale)
++            // alone marks the selection.
+             Rectangle {
+                 anchors.fill: previewFrame
+                 anchors.margins: -Style.space(4)
+                 radius: previewFrame.radius + Style.space(4)
+                 color: Commons.Color.accent
+-                opacity: card.lifted ? 0.85 : 0
++                opacity: 0
+                 visible: opacity > 0
+                 layer.enabled: visible
+                 layer.effect: MultiEffect {
+@@ -566,7 +585,7 @@ Ui.BorderSurface {
+     }
+ 
+     Behavior on x {
+-        enabled: card.controller.motionSettled
++        enabled: card.controller.motionSettled && !card.controller.rowsTracking
+ 
+         NumberAnimation {
+             duration: card.controller.previewAnimationDuration
+@@ -576,7 +595,7 @@ Ui.BorderSurface {
+     }
+ 
+     Behavior on y {
+-        enabled: card.controller.motionSettled
++        enabled: card.controller.motionSettled && !card.controller.rowsTracking
+ 
+         NumberAnimation {
+             duration: card.controller.previewAnimationDuration
+diff --git i/tests/theme/shell.qml w/tests/theme/shell.qml
+index a045ea1..eebcfe9 100644
+--- i/tests/theme/shell.qml
++++ w/tests/theme/shell.qml
+@@ -38,6 +38,9 @@ ShellRoot {
+         property string previewPlacement: "in-place"
+         property string windowFooterStyle: "floating"
+         property string selectionStyle: "outline"
++        property string layoutMode: "grid"
++        property bool workspaceRowLabels: true
++        property bool rowsTracking: false
+         property bool livePreviews: true
+         property string animationStyle: "original"
+         property string animationDurationPreviewStyle: ""
+@@ -168,7 +171,7 @@ ShellRoot {
+         // Page 3 skips the drag toggle, which is disabled while the strip is off.
+         // Page 4: category, enable, four corner actions, top right's command,
+         // all displays, ignore fullscreen, delay.
+-        var expectedCounts = [5, 6, 3, 4, 10, 8];
++        var expectedCounts = [5, 7, 3, 4, 10, 8];
+         require(items.length === expectedCounts[index % 6], "focusable controls on page " + index);
+         settings.focusSettingsCategory();
+         require(items[0].activeFocus, "category focus on page " + index);
+diff --git i/tests/tst_grid_layout.qml w/tests/tst_grid_layout.qml
+index d310a84..f91a93d 100644
+--- i/tests/tst_grid_layout.qml
++++ w/tests/tst_grid_layout.qml
+@@ -28,6 +28,199 @@ TestCase {
+         return (rect.width - padding * 2) / (rect.height - footer - padding * 3);
+     }
+ 
++    // Workspace 1 holds a half-screen window and a narrower one focused last;
++    // workspace 3 holds one full-height window. Items arrive out of order.
++    function workspaceItems() {
++        return [
++            { row: 3, height: 1080, ratio: 1920 / 1080, x: 0, y: 0, focused: true },
++            { row: 1, height: 1080, ratio: 640 / 1080, x: 1280, y: 0, focused: true },
++            { row: 1, height: 1080, ratio: 1280 / 1080, x: 0, y: 0, focused: false }
++        ];
++    }
++
++    function rowsLayout(items) {
++        return GridLayout.computeWorkspaceRows(items, areaWidth, areaHeight, gap, padding, footer, 0.5);
++    }
++
++    function test_workspaceRowsStackWorkspacesTopToBottom() {
++        var rects = rowsLayout(workspaceItems());
++        compare(rects.length, 3);
++        verify(rects[1].y + rects[1].height <= rects[0].y, "workspace 1 sits above workspace 3");
++        verify(rects[2].y + rects[2].height <= rects[0].y);
++        verify(rects[2].x + rects[2].width <= rects[1].x, "windows run left to right in screen order");
++    }
++
++    function test_workspaceRowsCentreEachRowOnItsFocusedWindow() {
++        var rects = rowsLayout(workspaceItems());
++        fuzzyCompare(rects[1].x + rects[1].width / 2, areaWidth / 2, 0.01);
++        fuzzyCompare(rects[0].x + rects[0].width / 2, areaWidth / 2, 0.01);
++    }
++
++    function test_workspaceRowsUseOneZoomAndKeepShapes() {
++        var items = workspaceItems();
++        items[2].height = 540;
++        var rects = rowsLayout(items);
++        for (var i = 0; i < rects.length; i++)
++            fuzzyCompare(previewRatio(rects[i]), items[i].ratio, 0.01);
++        var scale = (rects[0].height - footer - padding * 3) / items[0].height;
++        fuzzyCompare((rects[2].height - footer - padding * 3) / items[2].height, scale, 0.001);
++        verify(scale <= 0.5 + 0.0001, "never larger than half size, as in niri");
++    }
++
++    function test_workspaceRowsShrinkToFitManyWorkspaces() {
++        var items = [];
++        for (var row = 1; row <= 6; row++)
++            items.push({ row: row, height: 1080, ratio: 1.6, x: 0, y: 0, focused: true });
++        var rects = rowsLayout(items);
++        for (var i = 0; i < rects.length; i++)
++            verify(rects[i].y >= -0.001 && rects[i].y + rects[i].height <= areaHeight + 0.001, "row " + i + " fits the height");
++    }
++
++    function manyWorkspaces(count) {
++        var items = [];
++        for (var row = 1; row <= count; row++)
++            items.push({ row: row, height: 1080, ratio: 1.6, x: 0, y: 0, focused: true });
++        return items;
++    }
++
++    function previewScale(rect, item) {
++        return (rect.height - footer - padding * 3) / item.height;
++    }
++
++    function test_workspaceRowsStopShrinkingAtTheFloorAndOverflow() {
++        var items = manyWorkspaces(6);
++        var rects = GridLayout.computeWorkspaceRows(items, areaWidth, areaHeight, gap, padding, footer, 0.5, 0.3);
++        fuzzyCompare(previewScale(rects[0], items[0]), 0.3, 0.001);
++        verify(rects.contentHeight > areaHeight, "six rows at the floor are taller than the area");
++        fuzzyCompare(rects[0].y, gap / 2, 0.001);
++        var fitting = GridLayout.computeWorkspaceRows(manyWorkspaces(2), areaWidth, areaHeight, gap, padding, footer, 0.5, 0.3);
++        compare(fitting.contentHeight, areaHeight);
++    }
++
++    function test_scrolledRowsMoveRowsAndClampToTheirLimits() {
++        var rects = GridLayout.computeWorkspaceRows(manyWorkspaces(6), areaWidth, areaHeight, gap, padding, footer, 0.5, 0.3);
++        var limits = GridLayout.rowsScrollLimits(rects, areaWidth, areaHeight, 16);
++        var spans = GridLayout.rowSpans(rects);
++        // Overflowing rows scroll far enough to centre the first and the last.
++        fuzzyCompare(limits.minY, spans[0].centre - areaHeight / 2, 0.001);
++        fuzzyCompare(limits.maxY, spans[5].centre - areaHeight / 2, 0.001);
++        verify(limits.maxY > rects.contentHeight - areaHeight);
++        var fitting = GridLayout.computeWorkspaceRows(manyWorkspaces(2), areaWidth, areaHeight, gap, padding, footer, 0.5, 0.3);
++        var still = GridLayout.rowsScrollLimits(fitting, areaWidth, areaHeight, 16);
++        compare(still.minY, 0);
++        compare(still.maxY, 0);
++        var moved = GridLayout.scrolledRows(rects, 100, { "2": -40 });
++        fuzzyCompare(moved[0].y, rects[0].y - 100, 0.001);
++        fuzzyCompare(moved[1].x, rects[1].x - 40, 0.001);
++        fuzzyCompare(moved[0].x, rects[0].x, 0.001);
++        compare(GridLayout.clampedScroll(5000, 0, limits.maxY), limits.maxY);
++        compare(GridLayout.clampedScroll(-5, 0, limits.maxY), 0);
++        compare(rects[1].label, 2);
++        compare(spans[1].label, "2");
++    }
++
++    function test_revealBringsALowRowIntoView() {
++        var rects = GridLayout.computeWorkspaceRows(manyWorkspaces(6), areaWidth, areaHeight, gap, padding, footer, 0.5, 0.3);
++        var next = GridLayout.revealInRows(rects, 5, 0, {}, areaWidth, areaHeight, 16, false);
++        var shown = GridLayout.scrolledRows(rects, next.y, next.x)[5];
++        verify(shown.y >= 16 - 0.001 && shown.y + shown.height <= areaHeight - 16 + 0.001, "last row inside the area");
++        var centred = GridLayout.revealInRows(rects, 2, 0, {}, areaWidth, areaHeight, 16, true);
++        var middle = GridLayout.scrolledRows(rects, centred.y, centred.x)[2];
++        fuzzyCompare(middle.y + middle.height / 2, areaHeight / 2, 0.5);
++    }
++
++    function test_wideRowScrollsSidewaysToEveryWindow() {
++        var items = [];
++        for (var column = 0; column < 6; column++)
++            items.push({ row: 1, height: 1080, ratio: 1.6, x: column * 1920, y: 0, focused: column === 2 });
++        var rects = GridLayout.computeWorkspaceRows(items, areaWidth, areaHeight, gap, padding, footer, 0.5, 0.3);
++        var limits = GridLayout.rowsScrollLimits(rects, areaWidth, areaHeight, 16);
++        verify(limits.rows["1"].min < 0 && limits.rows["1"].max > 0, "the row scrolls both ways from its centred start");
++        var next = GridLayout.revealInRows(rects, 5, 0, {}, areaWidth, areaHeight, 16, false);
++        var shown = GridLayout.scrolledRows(rects, next.y, next.x)[5];
++        verify(shown.x >= 16 - 0.001 && shown.x + shown.width <= areaWidth - 16 + 0.001, "rightmost window brought inside");
++        var first = GridLayout.revealInRows(rects, 0, 0, next.x, areaWidth, areaHeight, 16, false);
++        var left = GridLayout.scrolledRows(rects, first.y, first.x)[0];
++        verify(left.x >= 16 - 0.001, "leftmost window brought inside");
++    }
++
++    function rowCentreAt(rects, index, scrollY) {
++        var shown = GridLayout.scrolledRows(rects, scrollY, {})[index];
++        return shown.y + shown.height / 2;
++    }
++
++    function test_stepScrollMovesOneWorkspaceRowAtATime() {
++        var rects = GridLayout.computeWorkspaceRows(manyWorkspaces(6), areaWidth, areaHeight, gap, padding, footer, 0.5, 0.3);
++        var down = GridLayout.stepRowsY(rects, 0, areaHeight, 1);
++        verify(down > 0, "a step down scrolls");
++        var spans = GridLayout.rowSpans(rects);
++        compare(spans.length, 6);
++        // Each step down centres the next row, the last one too, then stays put.
++        var y = 0;
++        var visited = [];
++        for (var step = 0; step < 10; step++) {
++            var next = GridLayout.stepRowsY(rects, y, areaHeight, 1);
++            if (next === y)
++                break;
++            y = next;
++            visited.push(y);
++        }
++        verify(visited.length >= 3 && visited.length <= 5, "one step per row, " + visited.length + " steps");
++        fuzzyCompare(rowCentreAt(rects, 5, y), areaHeight / 2, 0.5);
++        compare(GridLayout.stepRowsY(rects, y, areaHeight, 1), y);
++        for (var middle = 1; middle < visited.length - 1; middle++)
++            verify(visited[middle] > visited[middle - 1], "steps keep going down");
++        // Steps up reach the first row centred, then stay put.
++        var top = 0;
++        for (var up = 0; up < 10; up++)
++            top = GridLayout.stepRowsY(rects, top, areaHeight, -1);
++        fuzzyCompare(rowCentreAt(rects, 0, top), areaHeight / 2, 0.5);
++        compare(GridLayout.stepRowsY(rects, top, areaHeight, -1), top);
++        // Up from the bottom comes back one row at a time.
++        verify(GridLayout.stepRowsY(rects, y, areaHeight, -1) < y);
++    }
++
++    function test_stepScrollCentresTheNextWindowInARow() {
++        var items = [];
++        for (var column = 0; column < 6; column++)
++            items.push({ row: 1, height: 1080, ratio: 1.6, x: column * 1920, y: 0, focused: column === 2 });
++        var rects = GridLayout.computeWorkspaceRows(items, areaWidth, areaHeight, gap, padding, footer, 0.5, 0.3);
++        var right = GridLayout.stepRowX(rects, 1, {}, areaWidth, 16, 1);
++        var moved = GridLayout.scrolledRows(rects, 0, { "1": right });
++        fuzzyCompare(moved[3].x + moved[3].width / 2, areaWidth / 2, 0.5);
++        var left = GridLayout.stepRowX(rects, 1, {}, areaWidth, 16, -1);
++        var back = GridLayout.scrolledRows(rects, 0, { "1": left });
++        fuzzyCompare(back[1].x + back[1].width / 2, areaWidth / 2, 0.5);
++        // At the end of the row a further step stays put.
++        var offset = 0;
++        for (var step = 0; step < 10; step++)
++            offset = GridLayout.stepRowX(rects, 1, { "1": offset }, areaWidth, 16, 1);
++        compare(GridLayout.stepRowX(rects, 1, { "1": offset }, areaWidth, 16, 1), offset);
++        var last = GridLayout.scrolledRows(rects, 0, { "1": offset });
++        fuzzyCompare(last[5].x + last[5].width / 2, areaWidth / 2, 0.5);
++        compare(GridLayout.stepRowX(rects, 7, {}, areaWidth, 16, 1), 0);
++    }
++
++    function test_swipeSnapsToTheNearestRowAndWindow() {
++        var rects = GridLayout.computeWorkspaceRows(manyWorkspaces(6), areaWidth, areaHeight, gap, padding, footer, 0.5, 0.3);
++        var spans = GridLayout.rowSpans(rects);
++        var nearThird = spans[2].centre - areaHeight / 2 + 20;
++        compare(GridLayout.nearestRowIndex(rects, nearThird, areaHeight), 2);
++        fuzzyCompare(rowCentreAt(rects, 2, GridLayout.centreRowScroll(rects, 2, areaHeight)), areaHeight / 2, 0.5);
++        var items = [];
++        for (var column = 0; column < 4; column++)
++            items.push({ row: 1, height: 1080, ratio: 1.6, x: column * 1920, y: 0, focused: column === 0 });
++        var row = GridLayout.computeWorkspaceRows(items, areaWidth, areaHeight, gap, padding, footer, 0.5, 0.3);
++        compare(GridLayout.nearestWindowIndex(row, 1, 0, areaWidth), 0);
++        var offset = GridLayout.centreWindowOffset(row, 1, 3, areaWidth, 16);
++        compare(GridLayout.nearestWindowIndex(row, 1, offset, areaWidth), 3);
++    }
++
++    function test_workspaceRowsWithoutWindowsOrSpaceLayOutNothing() {
++        compare(rowsLayout([]).length, 0);
++        compare(GridLayout.computeWorkspaceRows(workspaceItems(), 0, areaHeight, gap, padding, footer, 0.5).length, 0);
++    }
++
+     function test_noWindowsOrNoSpaceLaysOutNothing() {
+         compare(layoutFor([]).length, 0);
+         compare(GridLayout.computeLayout([1.6], 0, areaHeight, gap, padding, footer).length, 0);
+diff --git i/tests/tst_settings_schema.qml w/tests/tst_settings_schema.qml
+index 902eaf4..8046308 100644
+--- i/tests/tst_settings_schema.qml
++++ w/tests/tst_settings_schema.qml
+@@ -11,6 +11,10 @@ TestCase {
+         compare(Schema.read(null, "moveCursorToWindow"), true);
+         compare(Schema.read(null, "hotCornerAllDisplays"), false);
+         compare(Schema.read(null, "hotCornerIgnoreFullscreen"), false);
++        compare(Schema.read(null, "windowLayout"), "grid");
++        compare(Schema.read({windowLayout: "workspaces"}, "windowLayout"), "workspaces");
++        compare(Schema.read(null, "workspaceRowLabels"), true);
++        compare(Schema.read({workspaceRowLabels: false}, "workspaceRowLabels"), false);
+     }
+ 
+     function test_enumReadsListedValueOnly() {
